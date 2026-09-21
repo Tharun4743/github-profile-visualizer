@@ -22,7 +22,7 @@ function renderSkillsRadar(username = '', theme = {}, options = {}) {
     { name: 'Full Stack', score: 0.96 },
     { name: 'Distributed', score: 0.88 },
     { name: 'System Design', score: 0.90 },
-    { name: 'APIs & DBs', score: 0.95 },
+    { name: 'APIs &amp; DBs', score: 0.95 },
   ];
 
   const totalAxes = skills.length;
@@ -85,7 +85,7 @@ function renderSkillsRadar(username = '', theme = {}, options = {}) {
     </text>
   </g>
 
-  <!-- Concentric Rings & Spokes -->
+  <!-- Concentric Rings and Spokes -->
   ${ringsSvg}
   ${spokesSvg}
 

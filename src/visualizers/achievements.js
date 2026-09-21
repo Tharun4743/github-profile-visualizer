@@ -24,7 +24,7 @@ function renderAchievements(username, data = {}, theme = {}, options = {}) {
       desc: `${totalCommits.toLocaleString()}+ commits`,
       tier: 'Diamond',
       color: '#00f0ff',
-      border: '#00f0ff88',
+      border: '#00f0ff',
     },
     {
       icon: '🏆',
@@ -32,7 +32,7 @@ function renderAchievements(username, data = {}, theme = {}, options = {}) {
       desc: `${activeDays}+ active days`,
       tier: 'Gold',
       color: '#ffd866',
-      border: '#ffd86688',
+      border: '#ffd866',
     },
     {
       icon: '🧠',
@@ -40,7 +40,7 @@ function renderAchievements(username, data = {}, theme = {}, options = {}) {
       desc: '5+ Languages',
       tier: 'Platinum',
       color: '#bd93f9',
-      border: '#bd93f988',
+      border: '#bd93f9',
     },
     {
       icon: '🚀',
@@ -48,7 +48,7 @@ function renderAchievements(username, data = {}, theme = {}, options = {}) {
       desc: `${reposCount}+ Repositories`,
       tier: 'Silver',
       color: '#50fa7b',
-      border: '#50fa7b88',
+      border: '#50fa7b',
     },
   ];
 
@@ -61,7 +61,7 @@ function renderAchievements(username, data = {}, theme = {}, options = {}) {
 
     cardsSvg += `
       <g transform="translate(${x}, ${y})">
-        <rect width="195" height="48" rx="6" fill="#131620" stroke="${ach.border}" stroke-width="1" />
+        <rect width="195" height="48" rx="6" fill="#131620" stroke="${ach.border}" stroke-opacity="0.5" stroke-width="1" />
         <text x="12" y="30" font-size="20">${ach.icon}</text>
         <text x="42" y="20" fill="#c0caf5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700">
           ${ach.title}
@@ -78,7 +78,7 @@ function renderAchievements(username, data = {}, theme = {}, options = {}) {
   <!-- Header -->
   <g transform="translate(24, 32)">
     <text fill="${titleColor}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">
-      🏆 Developer Achievements & Medals • @${username}
+      🏆 Developer Achievements &amp; Medals • @${username}
     </text>
   </g>
 

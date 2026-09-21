@@ -16,7 +16,8 @@ function renderCommitVelocity(days = [], username = '', theme = {}, options = {}
   const monthSums = new Array(12).fill(0);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-  days.forEach((d) => {
+  const safeDays = Array.isArray(days) ? days : [];
+  safeDays.forEach((d) => {
     if (!d.date) return;
     const m = parseInt(d.date.split('-')[1], 10) - 1;
     if (m >= 0 && m < 12) {
@@ -87,7 +88,7 @@ function renderCommitVelocity(days = [], username = '', theme = {}, options = {}
       📈 Commit Velocity Wave • @${username}
     </text>
     <text y="18" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">
-      Monthly Engineering Momentum & Volume Curve
+      Monthly Engineering Momentum &amp; Volume Curve
     </text>
   </g>
 
@@ -97,7 +98,7 @@ function renderCommitVelocity(days = [], username = '', theme = {}, options = {}
   <!-- Wave Stroke -->
   <path d="${pathD}" fill="none" stroke="${lineColor}" stroke-width="2.5" stroke-linecap="round" />
 
-  <!-- Markers & Labels -->
+  <!-- Markers and Labels -->
   ${markersSvg}
 
   <!-- Personal Branding Watermark -->

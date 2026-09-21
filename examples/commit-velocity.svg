@@ -14,7 +14,7 @@
       📈 Commit Velocity Wave • @Tharun4743
     </text>
     <text y="18" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">
-      Monthly Engineering Momentum & Volume Curve
+      Monthly Engineering Momentum &amp; Volume Curve
     </text>
   </g>
 
@@ -24,7 +24,7 @@
   <!-- Wave Stroke -->
   <path d="M 32 108.02439024390245 C 38.1,108.8 56.4,113.0 68.6,112.7 C 80.8,112.3 93.1,100.3 105.3,105.7 C 117.5,111.1 129.7,136.2 141.9,145.1 C 154.1,154.0 166.3,163.6 178.5,159.0 C 190.8,154.4 203.0,126.9 215.2,117.3 C 227.4,107.6 239.6,110.0 251.8,101.1 C 264.0,92.2 276.2,67.1 288.5,64.0 C 300.7,60.9 312.9,70.6 325.1,82.5 C 337.3,94.5 349.5,124.6 361.7,135.8 C 373.9,147.0 386.2,148.6 398.4,149.7 C 410.6,150.9 428.9,143.9 435.0,142.8" fill="none" stroke="#00f0ff" stroke-width="2.5" stroke-linecap="round" />
 
-  <!-- Markers & Labels -->
+  <!-- Markers and Labels -->
   <text x="32" y="177" text-anchor="middle" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10">Jan</text>
         <circle cx="32" cy="108.02439024390245" r="3" fill="#00f0ff" stroke="#131620" stroke-width="1.5">
           <title>Jan: 44 contributions</title>
