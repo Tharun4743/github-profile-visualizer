@@ -1,5 +1,5 @@
 name: 'GitHub Profile Visualizer'
-description: 'All-in-one developer profile visualizer: 3D contribution city, coding habits, recent activity stream, languages matrix, trophies, commit velocity wave, skills radar, and LeetCode cards'
+description: 'All-in-one 3D contribution city, coding habits, velocity waves, skills radar, languages matrix, and LeetCode cards'
 author: 'Tharun4743'
 
 inputs:
