@@ -2,12 +2,13 @@
 
 # ⚡ GitHub Profile 3D City
 
-### Turn your GitHub contribution calendar into an isometric 3D cyber city skyline.
+### Turn your GitHub contribution calendar into an animated 3D isometric cyber city skyline.
 
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-GitHub%20Profile%203D%20City-purple?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/marketplace/actions/github-profile-3d-city)
 [![GitHub release](https://img.shields.io/github/v/release/Tharun4743/github-profile-3d-city?color=7aa2f7&style=for-the-badge)](https://github.com/Tharun4743/github-profile-3d-city/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-00f0ff?style=for-the-badge)](LICENSE)
-[![GitHub Action](https://img.shields.io/badge/GitHub%20Action-Node%2020-ff79c6?style=for-the-badge&logo=githubactions&logoColor=white)](action.yml)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-00d26a?style=for-the-badge)](https://github.com/Tharun4743/github-profile-3d-city/pulls)
+[![Node 20](https://img.shields.io/badge/Runtime-Node.js%2020-00d26a?style=for-the-badge&logo=nodedotjs&logoColor=white)](package.json)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-ff79c6?style=for-the-badge)](https://github.com/Tharun4743/github-profile-3d-city/pulls)
 
 <br/>
 
@@ -18,31 +19,49 @@
 
 ---
 
-## 🌟 Highlights
+## 🌟 Features
 
-- **Pure SVG Vector Engine**: 100% vector SVG with zero canvas, puppeteer, or heavy binary dependencies.
-- **Dynamic 3D Isometric Math**: Generates precise 3D diamond pillars with elevation scaling proportional to daily commits.
-- **Multiple Aesthetic Themes**: Built-in palettes including `cyberpunk`, `tokyonight`, `emerald`, and `sunset`.
-- **Interactive Tooltips**: Hover over individual towers to view the exact date and contribution count.
-- **Dual Execution**: Run directly in GitHub Actions on an automated schedule or invoke on demand via the CLI.
+- 🏙️ **Isometric 3D Vector Math**: Generates crisp, lightweight vector SVGs with zero Chromium, Puppeteer, or canvas dependencies.
+- 🎨 **10+ Curated Developer Themes**: Including Cyberpunk, Tokyo Night, Dracula, Nord, Matrix, Synthwave, Monokai, and GitHub Dark.
+- 🌈 **Custom Color Palettes**: Provide any 5 hex codes (`#161b22,#0e4429,...`) to match your exact brand or portfolio.
+- ✨ **Neon Lighting Animations**: CSS-powered ambient pulse and hover glow on skyscraper rooftops.
+- 📐 **Elevation Controls**: Adjust tower heights with the `height-scale` multiplier.
+- 📅 **Multi-Year Support**: Render telemetry for specific calendar years (`2025`, `2024`) or the rolling last 365 days.
+- ⚡ **Dual Execution**: Run automatically via **GitHub Actions** or generate on-demand via the **CLI**.
 
 ---
 
 ## 🎨 Themes Showcase
 
-| Cyberpunk (Neon City) | Tokyo Night (Midnight) |
-| :---: | :---: |
-| ![Cyberpunk](examples/profile-3d-cyberpunk.svg) | ![Tokyo Night](examples/profile-3d-tokyonight.svg) |
+<div align="center">
 
-| Emerald (GitHub Green) | Sunset (Neon Horizon) |
+| Cyberpunk Neon | Dracula |
 | :---: | :---: |
-| ![Emerald](examples/profile-3d-emerald.svg) | ![Sunset](examples/profile-3d-sunset.svg) |
+| ![Cyberpunk](examples/profile-3d-cyberpunk.svg) | ![Dracula](examples/profile-3d-dracula.svg) |
+
+| Tokyo Night | Nord Frost |
+| :---: | :---: |
+| ![Tokyo Night](examples/profile-3d-tokyonight.svg) | ![Nord](examples/profile-3d-nord.svg) |
+
+| Matrix Code | Synthwave 84 |
+| :---: | :---: |
+| ![Matrix](examples/profile-3d-matrix.svg) | ![Synthwave](examples/profile-3d-synthwave.svg) |
+
+| Monokai Pro | Neon Sunset |
+| :---: | :---: |
+| ![Monokai](examples/profile-3d-monokai.svg) | ![Sunset](examples/profile-3d-sunset.svg) |
+
+| GitHub Dark | Custom Hex Palette |
+| :---: | :---: |
+| ![GitHub Dark](examples/profile-3d-github-dark.svg) | ![Custom Palette](examples/profile-3d-custom.svg) |
+
+</div>
 
 ---
 
-## 🚀 Quickstart: Use as a GitHub Action
+## 🚀 Quickstart: GitHub Actions
 
-Add a workflow file to your special profile repository (`username/username`) at `.github/workflows/profile-3d-city.yml`:
+Add this workflow to your profile repository (`username/username`) at `.github/workflows/profile-3d-city.yml`:
 
 ```yaml
 name: Update 3D Contribution City
@@ -77,9 +96,10 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add profile-3d-contrib/
           if git diff --cached --quiet; then
-            echo "No 3D changes to commit."
+            echo "No 3D city changes to commit."
           else
-            git commit -m "chore: update 3d contribution city skyline"
+            git commit -m "chore: update 3D contribution city [skip ci]"
+            git pull --rebase origin main
             git push
           fi
 ```
@@ -92,63 +112,100 @@ Then display the SVG in your profile `README.md`:
 
 ---
 
-## 💻 Quickstart: Use via CLI
+## ⚙️ Configuration Options
 
-Generate 3D SVGs locally or within custom CI pipelines without installing:
+| Input | Description | Required | Default |
+| :--- | :--- | :---: | :--- |
+| `username` | Target GitHub username | No | `${{ github.repository_owner }}` |
+| `theme` | Built-in theme: `cyberpunk`, `tokyonight`, `dracula`, `nord`, `matrix`, `synthwave`, `monokai`, `sunset`, `github-dark`, `github-light` | No | `'cyberpunk'` |
+| `custom-colors` | 5 comma-separated hex colors for levels 0–4 (e.g. `"#161b22,#0e4429,#006d32,#26a641,#39d353"`) | No | `''` |
+| `custom-bg` | Custom canvas background hex color | No | `''` |
+| `title` | Custom header title | No | `⚡ {username}'s 3D Contribution City` |
+| `hide-header` | Hide header title and telemetry statistics (`true`/`false`) | No | `'false'` |
+| `hide-legend` | Hide bottom activity legend (`true`/`false`) | No | `'false'` |
+| `animate` | Enable pulsing neon lighting reflection animation (`true`/`false`) | No | `'true'` |
+| `height-scale`| Multiplier for tower elevation (`1.0`, `1.5`, `2.0`) | No | `'1.0'` |
+| `year` | Specific calendar year (e.g. `2025`) or `'last-year'` | No | `'last-year'` |
+| `output-dir` | Target directory where the SVG will be saved | No | `'profile-3d-contrib'` |
+| `filename` | Output SVG filename | No | `'profile-3d-city.svg'` |
+| `generate-all`| Generate all theme variants simultaneously (`true`/`false`) | No | `'false'` |
+| `token` | GitHub access token (e.g. `${{ secrets.GITHUB_TOKEN }}`) | No | `${{ github.token }}` |
+
+### Action Outputs
+
+| Output | Description |
+| :--- | :--- |
+| `svg-path` | Absolute file path to the generated SVG |
+| `total-contributions` | Total contribution count detected |
+| `active-days` | Count of active contribution days |
+
+---
+
+## 💻 CLI Usage
+
+Run without installing via `npx`:
 
 ```bash
-# Generate default cyberpunk city
+# Default Cyberpunk theme
 npx github-profile-3d-city --username Tharun4743
 
-# Generate Tokyo Night theme into custom directory
-npx github-profile-3d-city --username Tharun4743 --theme tokyonight --output ./assets
+# Specific theme with elevation multiplier
+npx github-profile-3d-city --username Tharun4743 --theme dracula --height-scale 1.5
 
-# Generate all available themes at once
+# User-defined custom color palette
+npx github-profile-3d-city --username Tharun4743 --custom-colors "#151515,#00d26a,#00f0ff,#bd93f9,#ff79c6" --title "My Cyber City"
+
+# Generate all 10 themes at once into custom directory
 npx github-profile-3d-city --username Tharun4743 --all --output ./3d-cities
 ```
 
 ### CLI Flags
 
-| Flag | Shorthand | Description | Default |
-| :--- | :--- | :--- | :--- |
-| `--username` | `-u` | Target GitHub username *(required)* | — |
-| `--theme` | `-t` | Theme: `cyberpunk`, `tokyonight`, `emerald`, `sunset` | `cyberpunk` |
-| `--output` | `-o` | Output directory destination | `./` |
-| `--filename`| `-f` | Output SVG filename | `profile-3d-city.svg` |
-| `--all` | `-a` | Generate all available themes | `false` |
-| `--help` | `-h` | Display help and options | — |
+| Flag | Short | Description | Default |
+| :--- | :---: | :--- | :--- |
+| `--username` | `-u` | GitHub username *(required)* | — |
+| `--theme` | `-t` | Built-in theme name | `cyberpunk` |
+| `--custom-colors` | `-c` | 5 comma-separated hex codes for levels 0–4 | — |
+| `--height-scale` | `-s` | Scale tower heights | `1.0` |
+| `--year` | `-y` | Year or `last-year` | `last-year` |
+| `--title` | — | Custom header text | — |
+| `--hide-header` | — | Hide header | `false` |
+| `--hide-legend` | — | Hide legend | `false` |
+| `--no-animate` | — | Disable animations | `false` |
+| `--all` | `-a` | Generate all themes | `false` |
+| `--output` | `-o` | Destination folder | `./` |
+| `--filename` | `-f` | Output SVG filename | `profile-3d-city.svg` |
 
 ---
 
-## ⚙️ GitHub Action Inputs
+## 📦 Programmatic Usage (Node.js)
 
-| Input | Description | Required | Default |
-| :--- | :--- | :---: | :--- |
-| `username` | GitHub username to generate the city for | No | `${{ github.repository_owner }}` |
-| `theme` | Palette: `cyberpunk`, `tokyonight`, `emerald`, `sunset` | No | `'cyberpunk'` |
-| `output-dir` | Directory where the SVG file will be saved | No | `'profile-3d-contrib'` |
-| `filename` | Filename for generated SVG | No | `'profile-3d-city.svg'` |
-| `generate-all`| Generate all themes into the output directory (`true`/`false`) | No | `'false'` |
-| `token` | GitHub access token (for GraphQL API) | No | `${{ github.token }}` |
+```javascript
+const { fetchContributions } = require('github-profile-3d-city/src/fetcher');
+const { render3DCity } = require('github-profile-3d-city/src/isometric');
 
----
+async function createCity() {
+  const data = await fetchContributions('Tharun4743');
+  const svg = render3DCity(data, 'Tharun4743', {
+    theme: 'dracula',
+    heightScale: 1.2,
+    animate: true,
+  });
+  console.log(svg);
+}
 
-## 🛠️ Development & Building
-
-```bash
-# Clone the repository
-git clone https://github.com/Tharun4743/github-profile-3d-city.git
-cd github-profile-3d-city
-
-# Install dependencies
-npm install
-
-# Test run locally
-node bin/cli.js --username Tharun4743 --theme cyberpunk
-
-# Compile single-file action bundle
-npm run build
+createCity();
 ```
+
+---
+
+## 🚀 How to Publish to GitHub Marketplace
+
+1. Open your repository: **[https://github.com/Tharun4743/github-profile-3d-city](https://github.com/Tharun4743/github-profile-3d-city)**.
+2. In the right-hand sidebar under **Releases**, click **"Draft a new release"** (or click the blue banner **"Publish this Action to the GitHub Marketplace"**).
+3. Check the checkbox: **"Publish this Action to the GitHub Marketplace"**.
+4. Select category: **Utilities** (and **Publishing**).
+5. Ensure the tag is set to `v1.1.0` and click **Publish release**!
 
 ---
 

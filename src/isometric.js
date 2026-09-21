@@ -1,13 +1,28 @@
-const { THEMES } = require('./themes');
+const { THEMES, createCustomTheme } = require('./themes');
 
 /**
- * Generates an Isometric 3D SVG from daily contribution data.
+ * Generates a Customizable Isometric 3D SVG City from daily contribution telemetry.
  */
-function render3DCity(data, username, themeKey = 'cyberpunk') {
+function render3DCity(data, username, options = {}) {
   const { days, total } = data;
-  const theme = THEMES[themeKey] || THEMES.cyberpunk;
 
-  // Group into 52+ weeks of 7 days
+  // Determine theme
+  let theme = null;
+  if (options.customColors) {
+    theme = createCustomTheme(options.customColors, options.customBg || '#0d1117');
+  }
+  if (!theme) {
+    const themeKey = (options.theme || 'cyberpunk').toLowerCase();
+    theme = THEMES[themeKey] || THEMES.cyberpunk;
+  }
+
+  const heightScale = typeof options.heightScale === 'number' && !isNaN(options.heightScale) ? options.heightScale : 1.0;
+  const animate = options.animate !== false;
+  const hideHeader = options.hideHeader === true;
+  const hideLegend = options.hideLegend === true;
+  const customTitle = options.title || `⚡ ${username}'s 3D Contribution City`;
+
+  // Group into weeks of 7 days
   const weeks = [];
   let currentWeek = [];
   days.forEach((day, i) => {
@@ -19,27 +34,24 @@ function render3DCity(data, username, themeKey = 'cyberpunk') {
   });
 
   const width = 940;
-  const height = 440;
+  const height = hideHeader ? 380 : 450;
   const tileW = 14;
   const tileH = 7;
   const originX = 430;
-  const originY = 55;
+  const originY = hideHeader ? 20 : 55;
 
-  // Build tile objects
   const tiles = [];
   for (let w = 0; w < weeks.length; w++) {
     for (let d = 0; d < weeks[w].length; d++) {
       const day = weeks[w][d];
       const level = Math.min(4, Math.max(0, day.level || 0));
 
-      // Isometric position
       const x = originX + (w * (tileW / 2)) - (d * tileW);
       const y = originY + (w * (tileH / 2)) + (d * tileH);
 
-      // Height formula: 0 level is 2.5px flat tile; levels 1-4 scale up
       let pillarHeight = 3;
       if (level > 0) {
-        pillarHeight = level * 10 + Math.min(30, (day.count || level) * 2);
+        pillarHeight = (level * 10 + Math.min(32, (day.count || level) * 2.2)) * heightScale;
       }
 
       tiles.push({
@@ -50,25 +62,21 @@ function render3DCity(data, username, themeKey = 'cyberpunk') {
         pillarHeight,
         level,
         day,
-        // Painter's algorithm depth: sort by screen Y and X so back is rendered first
         depth: y + (x * 0.001),
       });
     }
   }
 
-  // Sort back-to-front (lowest Y drawn first)
+  // Painter's algorithm sort
   tiles.sort((a, b) => a.depth - b.depth);
-
-  // Active days count
   const activeDays = days.filter((d) => (d.level || 0) > 0).length;
 
   let pillarsSvg = '';
-  for (const tile of tiles) {
+  for (let idx = 0; idx < tiles.length; idx++) {
+    const tile = tiles[idx];
     const { x, y, pillarHeight, level, day } = tile;
     const colors = theme.levels[level] || theme.levels[0];
 
-    // Diamond vertices:
-    // Top roof
     const topX = x;
     const topY = y - pillarHeight;
     const rightX = x + tileW / 2;
@@ -78,58 +86,41 @@ function render3DCity(data, username, themeKey = 'cyberpunk') {
     const leftX = x - tileW / 2;
     const leftY = y + tileH / 2 - pillarHeight;
 
-    // Base ground bottom vertices
     const baseBottomY = y + tileH;
     const baseLeftY = y + tileH / 2;
     const baseRightY = y + tileH / 2;
 
-    // SVG polygon points
-    const leftWallPoints = `${leftX},${leftY} ${bottomX},${bottomY} ${bottomX},${baseBottomY} ${leftX},${baseLeftY}`;
-    const rightWallPoints = `${bottomX},${bottomY} ${rightX},${rightY} ${rightX},${baseRightY} ${bottomX},${baseBottomY}`;
-    const roofPoints = `${topX},${topY} ${rightX},${rightY} ${bottomX},${bottomY} ${leftX},${leftY}`;
+    const leftWall = `${leftX},${leftY} ${bottomX},${bottomY} ${bottomX},${baseBottomY} ${leftX},${baseLeftY}`;
+    const rightWall = `${bottomX},${bottomY} ${rightX},${rightY} ${rightX},${baseRightY} ${bottomX},${baseBottomY}`;
+    const roof = `${topX},${topY} ${rightX},${rightY} ${bottomX},${bottomY} ${leftX},${leftY}`;
 
-    const tooltip = `${day.date}: ${day.count || (level > 0 ? '1+' : '0')} contributions`;
+    const tooltip = `${day.date}: ${day.count || (level > 0 ? '1+' : '0')} commits`;
+    const animClass = animate && level >= 3 ? ' tower glow-pulse' : ' tower';
 
     pillarsSvg += `
-      <g class="tower" tabindex="0">
+      <g class="${animClass}" tabindex="0">
         <title>${tooltip}</title>
-        <polygon points="${leftWallPoints}" fill="${colors.left}" />
-        <polygon points="${rightWallPoints}" fill="${colors.right}" />
-        <polygon points="${roofPoints}" fill="${colors.top}" />
+        <polygon points="${leftWall}" fill="${colors.left}" />
+        <polygon points="${rightWall}" fill="${colors.right}" />
+        <polygon points="${roof}" fill="${colors.top}" />
       </g>`;
   }
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="100%" height="auto">
-  <defs>
-    <linearGradient id="bg-canvas" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="${theme.bgStart}" />
-      <stop offset="100%" stop-color="${theme.bgEnd}" />
-    </linearGradient>
-    <filter id="city-glow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="${theme.titleColor}" flood-opacity="0.18" />
-    </filter>
-    <style>
-      .tower { transition: transform 0.2s ease, filter 0.2s ease; cursor: pointer; }
-      .tower:hover { filter: brightness(1.35) drop-shadow(0 0 6px ${theme.titleColor}); }
-      .stat-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; fill: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
-      .stat-value { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 700; fill: ${theme.statColor}; }
-    </style>
-  </defs>
-
-  <!-- Container Box -->
-  <rect width="${width}" height="${height}" rx="14" fill="url(#bg-canvas)" stroke="${theme.border}" stroke-width="1.5" />
-
+  // Header and Legend templates
+  const headerSvg = hideHeader
+    ? ''
+    : `
   <!-- Header Section -->
   <g transform="translate(36, 42)">
     <text fill="${theme.titleColor}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700">
-      ⚡ ${username}'s 3D Contribution City
+      ${customTitle}
     </text>
     <text y="22" fill="${theme.subtitleColor}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">
-      ${theme.name} Edition • Powered by github-profile-3d-city
+      ${theme.name} • 3D Isometric Telemetry
     </text>
   </g>
 
-  <!-- Telemetry Badges in Header Right -->
+  <!-- Telemetry Badges -->
   <g transform="translate(620, 28)">
     <g transform="translate(0, 0)">
       <text class="stat-label">Total Commits</text>
@@ -139,15 +130,13 @@ function render3DCity(data, username, themeKey = 'cyberpunk') {
       <text class="stat-label">Active Days</text>
       <text y="20" class="stat-value">${activeDays} days</text>
     </g>
-  </g>
+  </g>`;
 
-  <!-- Isometric 3D Projection -->
-  <g transform="translate(0, 48)" filter="url(#city-glow)">
-    ${pillarsSvg}
-  </g>
-
+  const legendSvg = hideLegend
+    ? ''
+    : `
   <!-- Legend in Footer -->
-  <g transform="translate(36, 412)">
+  <g transform="translate(36, ${height - 24})">
     <text fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="10">Less</text>
     <rect x="32" y="-9" width="10" height="10" rx="2" fill="${theme.levels[0].top}" stroke="${theme.border}" stroke-width="0.5" />
     <rect x="46" y="-9" width="10" height="10" rx="2" fill="${theme.levels[1].top}" />
@@ -155,7 +144,47 @@ function render3DCity(data, username, themeKey = 'cyberpunk') {
     <rect x="74" y="-9" width="10" height="10" rx="2" fill="${theme.levels[3].top}" />
     <rect x="88" y="-9" width="10" height="10" rx="2" fill="${theme.levels[4].top}" />
     <text x="104" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="10">More</text>
+  </g>`;
+
+  const animationCss = animate
+    ? `
+      @keyframes neon-sweep {
+        0%, 100% { filter: brightness(1); }
+        50% { filter: brightness(1.22) drop-shadow(0 0 5px ${theme.titleColor}); }
+      }
+      .glow-pulse { animation: neon-sweep 4s ease-in-out infinite; }
+    `
+    : '';
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="100%" height="auto">
+  <defs>
+    <linearGradient id="bg-canvas" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${theme.bgStart}" />
+      <stop offset="100%" stop-color="${theme.bgEnd}" />
+    </linearGradient>
+    <filter id="city-glow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="${theme.titleColor}" flood-opacity="0.16" />
+    </filter>
+    <style>
+      .tower { transition: transform 0.2s ease, filter 0.2s ease; cursor: pointer; }
+      .tower:hover { filter: brightness(1.4) drop-shadow(0 0 8px ${theme.titleColor}); }
+      .stat-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; fill: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
+      .stat-value { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; font-weight: 700; fill: ${theme.statColor}; }
+      ${animationCss}
+    </style>
+  </defs>
+
+  <!-- Container Box -->
+  <rect width="${width}" height="${height}" rx="14" fill="url(#bg-canvas)" stroke="${theme.border}" stroke-width="1.5" />
+
+  ${headerSvg}
+
+  <!-- Isometric 3D Projection -->
+  <g transform="translate(0, ${hideHeader ? 30 : 48})" filter="url(#city-glow)">
+    ${pillarsSvg}
   </g>
+
+  ${legendSvg}
 </svg>`;
 }
 

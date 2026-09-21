@@ -1,5 +1,5 @@
 name: 'GitHub Profile 3D City'
-description: 'Generate dynamic 3D isometric contribution city SVGs for your GitHub profile README'
+description: 'Generate customizable, animated 3D isometric contribution city skylines for your GitHub profile README'
 author: 'Tharun4743'
 
 inputs:
@@ -8,13 +8,45 @@ inputs:
     required: false
     default: ${{ github.repository_owner }}
   token:
-    description: 'GitHub token (e.g. secrets.GITHUB_TOKEN). Optional, but recommended for GraphQL API'
+    description: 'GitHub token (e.g. secrets.GITHUB_TOKEN) for GraphQL API telemetry'
     required: false
     default: ${{ github.token }}
   theme:
-    description: 'Color theme: cyberpunk, tokyonight, emerald, or sunset'
+    description: 'Color theme: cyberpunk, tokyonight, dracula, nord, matrix, synthwave, monokai, sunset, github-dark, github-light'
     required: false
     default: 'cyberpunk'
+  custom-colors:
+    description: 'Optional comma-separated list of 5 hex colors for levels 0 to 4 (e.g. "#161b22,#0e4429,#006d32,#26a641,#39d353")'
+    required: false
+    default: ''
+  custom-bg:
+    description: 'Optional hex background color for custom color theme'
+    required: false
+    default: ''
+  title:
+    description: 'Custom header title text'
+    required: false
+    default: ''
+  hide-header:
+    description: 'Whether to hide the top header title and telemetry counters (true/false)'
+    required: false
+    default: 'false'
+  hide-legend:
+    description: 'Whether to hide the bottom activity legend (true/false)'
+    required: false
+    default: 'false'
+  animate:
+    description: 'Whether to enable pulsing neon light reflection animations across towers (true/false)'
+    required: false
+    default: 'true'
+  height-scale:
+    description: 'Multiplier for 3D tower elevation (e.g. 1.0, 1.5, 2.0)'
+    required: false
+    default: '1.0'
+  year:
+    description: 'Year to fetch contributions for (e.g. 2025) or "last-year"'
+    required: false
+    default: 'last-year'
   output-dir:
     description: 'Target directory where the generated SVG file will be saved'
     required: false
@@ -33,11 +65,13 @@ outputs:
     description: 'Absolute path to the generated SVG file'
   total-contributions:
     description: 'Total number of contributions found'
+  active-days:
+    description: 'Total number of active contribution days'
 
 runs:
   using: 'node20'
   main: 'dist/index.js'
 
 branding:
-  icon: 'grid'
+  icon: 'activity'
   color: 'purple'

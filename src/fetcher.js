@@ -2,26 +2,34 @@ const https = require('https');
 
 /**
  * Fetches daily contribution history for a given GitHub username.
- * Supports GitHub GraphQL API (if token provided) with fallback to public page scraper.
+ * Supports year selection, GitHub GraphQL API with token, and public scraper fallback.
  */
-async function fetchContributions(username, token) {
+async function fetchContributions(username, token, year = 'last-year') {
   if (token) {
     try {
-      const data = await fetchFromGraphQL(username, token);
-      if (data && data.length > 0) return data;
+      const data = await fetchFromGraphQL(username, token, year);
+      if (data && data.days && data.days.length > 0) return data;
     } catch (err) {
-      console.warn('GraphQL fetch failed, falling back to public scraper:', err.message);
+      console.warn('GraphQL fetch warning:', err.message, 'Falling back to public scraper...');
     }
   }
-  return fetchFromPublic(username);
+  return fetchFromPublic(username, year);
 }
 
-function fetchFromGraphQL(username, token) {
+function fetchFromGraphQL(username, token, year) {
   return new Promise((resolve, reject) => {
+    let dateArgs = '';
+    if (year && year !== 'last-year') {
+      const y = parseInt(year, 10);
+      if (!isNaN(y)) {
+        dateArgs = `from: "${y}-01-01T00:00:00Z", to: "${y}-12-31T23:59:59Z"`;
+      }
+    }
+
     const query = `
       query($login: String!) {
         user(login: $login) {
-          contributionsCollection {
+          contributionsCollection(${dateArgs}) {
             contributionCalendar {
               totalContributions
               weeks {
@@ -94,12 +102,20 @@ function fetchFromGraphQL(username, token) {
   });
 }
 
-function fetchFromPublic(username) {
+function fetchFromPublic(username, year) {
   return new Promise((resolve, reject) => {
+    let path = `/users/${username}/contributions`;
+    if (year && year !== 'last-year') {
+      const y = parseInt(year, 10);
+      if (!isNaN(y)) {
+        path += `?from=${y}-12-01&to=${y}-12-31`;
+      }
+    }
+
     https.get(
       {
         hostname: 'github.com',
-        path: `/users/${username}/contributions`,
+        path,
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
@@ -121,8 +137,7 @@ function fetchFromPublic(username) {
             });
           }
 
-          // Parse total contributions from header if available
-          const totalMatch = html.match(/([\d,]+)\s+contributions\s+in\s+the\s+last\s+year/i);
+          const totalMatch = html.match(/([\d,]+)\s+contributions/i);
           if (totalMatch) {
             total = parseInt(totalMatch[1].replace(/,/g, ''), 10);
           } else {
