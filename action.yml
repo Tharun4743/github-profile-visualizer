@@ -1,0 +1,43 @@
+name: 'GitHub Profile 3D City'
+description: 'Generate dynamic 3D isometric contribution city SVGs for your GitHub profile README'
+author: 'Tharun4743'
+
+inputs:
+  username:
+    description: 'GitHub username to generate the 3D contribution city for'
+    required: false
+    default: ${{ github.repository_owner }}
+  token:
+    description: 'GitHub token (e.g. secrets.GITHUB_TOKEN). Optional, but recommended for GraphQL API'
+    required: false
+    default: ${{ github.token }}
+  theme:
+    description: 'Color theme: cyberpunk, tokyonight, emerald, or sunset'
+    required: false
+    default: 'cyberpunk'
+  output-dir:
+    description: 'Target directory where the generated SVG file will be saved'
+    required: false
+    default: 'profile-3d-contrib'
+  filename:
+    description: 'Filename for the generated SVG'
+    required: false
+    default: 'profile-3d-city.svg'
+  generate-all:
+    description: 'Whether to generate all themes into the output directory (true/false)'
+    required: false
+    default: 'false'
+
+outputs:
+  svg-path:
+    description: 'Absolute path to the generated SVG file'
+  total-contributions:
+    description: 'Total number of contributions found'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'grid'
+  color: 'purple'
