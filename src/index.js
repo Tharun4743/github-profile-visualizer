@@ -65,6 +65,7 @@ async function run() {
       core.info(`🎲 Dynamic Theme Engine: Selected "${activeThemeKey}" theme for this run.`);
     }
 
+    const radarSkills = core.getInput('radar-skills');
     const selectedTheme = THEMES[activeThemeKey] || THEMES.cyberpunk;
     const universalOptions = {
       theme: activeThemeKey,
