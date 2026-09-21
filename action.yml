@@ -1,5 +1,5 @@
-name: 'GitHub Profile 3D City & Activity Suite'
-description: 'All-in-one developer activity visualizer: animated 3D isometric city skylines, coding habits, recent activity stream, languages matrix, and LeetCode cards'
+name: 'GitHub Profile Visualizer'
+description: 'All-in-one developer profile visualizer: 3D contribution city, coding habits, recent activity stream, languages matrix, and LeetCode cards'
 author: 'Tharun4743'
 
 inputs:
@@ -10,7 +10,7 @@ inputs:
   visualizers:
     description: 'Visualizers to generate: "all" or comma-separated list ("3d-city,activity,habits,languages,leetcode")'
     required: false
-    default: '3d-city'
+    default: 'all'
   theme:
     description: 'Color theme: cyberpunk, tokyonight, dracula, nord, matrix, synthwave, monokai, sunset, github-dark, github-light'
     required: false
@@ -54,7 +54,7 @@ inputs:
   output-dir:
     description: 'Target directory where generated SVG files will be saved'
     required: false
-    default: 'profile-3d-contrib'
+    default: 'assets'
   filename:
     description: 'Filename for primary 3D city SVG'
     required: false
@@ -72,7 +72,7 @@ outputs:
   svg-path:
     description: 'Path to generated 3D City SVG'
   activity-svg-path:
-    description: 'Path to generated Recent Activity Timeline SVG'
+    description: 'Path to generated Recent Activity SVG'
   habits-svg-path:
     description: 'Path to generated Coding Habits SVG'
   languages-svg-path:

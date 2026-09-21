@@ -1,14 +1,14 @@
 <div align="center">
 
-# ⚡ GitHub Profile 3D City & Activity Suite
+# ⚡ GitHub Profile Visualizer
 
-### All-in-one developer activity visualizer: 3D isometric city skylines, coding habits radar, recent activity stream, language matrix, and LeetCode cards.
+### The all-in-one developer profile visualizer suite: 3D contribution city skylines, coding habits radar, recent activity stream, languages matrix, and LeetCode cards.
 
-[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-GitHub%20Profile%203D%20City-purple?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/marketplace/actions/github-profile-3d-city-activity-suite)
-[![GitHub release](https://img.shields.io/github/v/release/Tharun4743/github-profile-3d-city?color=7aa2f7&style=for-the-badge)](https://github.com/Tharun4743/github-profile-3d-city/releases)
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-GitHub%20Profile%20Visualizer-purple?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/marketplace/actions/github-profile-visualizer)
+[![GitHub release](https://img.shields.io/github/v/release/Tharun4743/github-profile-visualizer?color=7aa2f7&style=for-the-badge)](https://github.com/Tharun4743/github-profile-visualizer/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-00f0ff?style=for-the-badge)](LICENSE)
 [![Node 20](https://img.shields.io/badge/Runtime-Node.js%2020-00d26a?style=for-the-badge&logo=nodedotjs&logoColor=white)](package.json)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-ff79c6?style=for-the-badge)](https://github.com/Tharun4743/github-profile-3d-city/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-ff79c6?style=for-the-badge)](https://github.com/Tharun4743/github-profile-visualizer/pulls)
 
 <br/>
 
@@ -21,7 +21,7 @@
 
 ## 🌟 The Visualizer Suite
 
-Instead of installing 4 or 5 separate actions, this suite generates **all your telemetry cards in a single run**:
+Generate **all your developer telemetry cards in a single, fast action run**:
 
 | 🕒 Productive Coding Habits | ⚡ Live Activity Stream |
 | :---: | :---: |
@@ -81,8 +81,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate Visualizer Suite
-        uses: Tharun4743/github-profile-3d-city@v1
+      - name: Generate All Profile Visualizers
+        uses: Tharun4743/github-profile-visualizer@v1
         with:
           username: ${{ github.repository_owner }}
           visualizers: 'all' # Generates 3D city, activity, habits, languages & leetcode
@@ -110,7 +110,7 @@ jobs:
 <!-- 3D Contribution City -->
 <img src="assets/profile-3d-city.svg" width="100%" alt="3D Contribution City" />
 
-<!-- Side-by-Side Activity & Habits -->
+<!-- 2x2 Telemetry Grid -->
 <table border="0" width="100%">
   <tr>
     <td width="50%"><img src="assets/coding-habits.svg" width="100%" /></td>
@@ -130,7 +130,7 @@ jobs:
 | Input | Description | Required | Default |
 | :--- | :--- | :---: | :--- |
 | `username` | Target GitHub username | No | `${{ github.repository_owner }}` |
-| `visualizers`| Choice of visualizers: `'all'` or comma-separated (`'3d-city,activity,habits,languages,leetcode'`) | No | `'3d-city'` |
+| `visualizers`| Choice of visualizers: `'all'` or comma-separated (`'3d-city,activity,habits,languages,leetcode'`) | No | `'all'` |
 | `theme` | Built-in palette: `cyberpunk`, `tokyonight`, `dracula`, `nord`, `matrix`, `synthwave`, `monokai`, `sunset`, `github-dark`, `github-light` | No | `'cyberpunk'` |
 | `custom-colors` | 5 comma-separated hex codes for custom palette (`"#161b22,#0e4429,#006d32,#26a641,#39d353"`) | No | `''` |
 | `title` | Custom header title for the 3D City | No | `⚡ {username}'s 3D Contribution City` |
@@ -140,7 +140,7 @@ jobs:
 | `hide-legend` | Hide bottom activity legend (`true`/`false`) | No | `'false'` |
 | `year` | Specific calendar year (e.g. `2025`) or `'last-year'` | No | `'last-year'` |
 | `leetcode-username`| LeetCode handle for problem solving telemetry | No | `${{ github.repository_owner }}` |
-| `output-dir` | Output folder where SVGs will be saved | No | `'profile-3d-contrib'` |
+| `output-dir` | Output folder where SVGs will be saved | No | `'assets'` |
 | `filename` | Output filename for primary 3D city SVG | No | `'profile-3d-city.svg'` |
 
 ### Action Outputs
@@ -161,20 +161,20 @@ jobs:
 
 ```bash
 # Generate the full visualizer suite
-npx github-profile-3d-city --username Tharun4743 --visualizers all --output ./assets
+npx github-profile-visualizer --username Tharun4743 --visualizers all --output ./assets
 
 # Generate only 3D City and Coding Habits in Dracula theme
-npx github-profile-3d-city --username Tharun4743 --visualizers "3d-city,habits" --theme dracula
+npx github-profile-visualizer --username Tharun4743 --visualizers "3d-city,habits" --theme dracula
 
 # Generate with custom hex palette
-npx github-profile-3d-city --username Tharun4743 --custom-colors "#151515,#00d26a,#00f0ff,#bd93f9,#ff79c6"
+npx github-profile-visualizer --username Tharun4743 --custom-colors "#151515,#00d26a,#00f0ff,#bd93f9,#ff79c6"
 ```
 
 ---
 
 ## 🚀 How to Publish to GitHub Marketplace
 
-1. Navigate to: **[https://github.com/Tharun4743/github-profile-3d-city](https://github.com/Tharun4743/github-profile-3d-city)**.
+1. Navigate to: **[https://github.com/Tharun4743/github-profile-visualizer](https://github.com/Tharun4743/github-profile-visualizer)**.
 2. In the right-hand sidebar under **Releases**, click on **Releases** or edit the latest release **v1.2.0**.
 3. Check the box: **☑ "Publish this Action to the GitHub Marketplace"**.
 4. Select category: **Utilities** (and **Continuous Integration**).

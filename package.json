@@ -1,24 +1,27 @@
 {
-  "name": "github-profile-3d-city",
-  "version": "1.0.0",
-  "description": "Dynamic 3D Isometric GitHub Contribution City generator (GitHub Action & CLI)",
+  "name": "github-profile-visualizer",
+  "version": "1.2.0",
+  "description": "All-in-one GitHub Profile Visualizer: 3D Contribution City, Coding Habits, Activity Stream, Languages Matrix & LeetCode Cards",
   "main": "src/index.js",
   "bin": {
-    "github-profile-3d-city": "./bin/cli.js"
+    "github-profile-visualizer": "./bin/cli.js"
   },
   "scripts": {
     "build": "ncc build src/index.js -o dist -m",
     "cli": "node bin/cli.js",
-    "generate-examples": "node scripts/generate-examples.js"
+    "test": "node bin/cli.js --username Tharun4743 --visualizers all --output ./examples"
   },
   "keywords": [
     "github-profile",
+    "profile-visualizer",
     "github-action",
-    "3d",
-    "isometric",
-    "contribution-graph",
-    "svg",
-    "profile-readme"
+    "3d-contribution",
+    "coding-habits",
+    "activity-feed",
+    "languages-matrix",
+    "leetcode",
+    "marketplace-action",
+    "svg-generator"
   ],
   "author": "Tharunkumar K <Tharun4743>",
   "license": "MIT",
