@@ -66,20 +66,22 @@ function fetchLeetCode(username) {
   });
 }
 
-async function renderLeetCodeCard(username, theme = {}) {
+async function renderLeetCodeCard(username, theme = {}, options = {}) {
   const lc = await fetchLeetCode(username);
 
-  const width = 467;
+  const width = options.width || 467;
   const height = 195;
-  const bg = theme.bgStart || '#1a1b27';
-  const border = theme.border || '#24283b';
+  const rx = options.borderRadius !== undefined ? options.borderRadius : 8;
+  const showBorder = options.showBorder !== false;
+  const bg = options.transparent ? 'none' : (theme.bgStart || '#1a1b27');
+  const border = showBorder ? (theme.border || '#24283b') : 'none';
 
   return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
   <style>
     .stat-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; font-weight: 600; fill: #c0caf5; }
     .stat-val { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; font-weight: 700; }
   </style>
-  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="8" fill="${bg}" stroke="${border}" stroke-width="1.5" />
+  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="${rx}" fill="${bg}" stroke="${border}" stroke-width="1.5" />
 
   <!-- Header -->
   <g transform="translate(24, 32)">

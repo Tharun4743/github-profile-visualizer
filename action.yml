@@ -1,5 +1,5 @@
 name: 'GitHub Profile Visualizer'
-description: 'All-in-one developer profile visualizer: 3D contribution city, coding habits, recent activity stream, languages matrix, and LeetCode cards'
+description: 'All-in-one developer profile visualizer: 3D contribution city, coding habits, recent activity stream, languages matrix, trophies, commit velocity wave, skills radar, and LeetCode cards'
 author: 'Tharun4743'
 
 inputs:
@@ -8,11 +8,11 @@ inputs:
     required: false
     default: ${{ github.repository_owner }}
   visualizers:
-    description: 'Visualizers to generate: "all" or comma-separated list ("3d-city,activity,habits,languages,leetcode")'
+    description: 'Visualizers to generate: "all" or comma-separated list ("3d-city,activity,habits,languages,leetcode,achievements,velocity,radar,summary")'
     required: false
     default: 'all'
   theme:
-    description: 'Color theme: cyberpunk, tokyonight, dracula, nord, matrix, synthwave, monokai, sunset, github-dark, github-light'
+    description: 'Color theme: cyberpunk, tokyonight, dracula, nord, matrix, synthwave, monokai, sunset, github-dark, github-light, emerald'
     required: false
     default: 'cyberpunk'
   custom-colors:
@@ -27,12 +27,24 @@ inputs:
     description: 'Custom header title for the 3D city'
     required: false
     default: ''
+  transparent:
+    description: 'Render with transparent background for seamless theme integration (true/false)'
+    required: false
+    default: 'false'
+  border-radius:
+    description: 'Corner radius in pixels (e.g. 0, 8, 14, 20)'
+    required: false
+    default: ''
+  show-border:
+    description: 'Whether to display card borders (true/false)'
+    required: false
+    default: 'true'
   hide-header:
-    description: 'Whether to hide the top header and telemetry counters in the 3D city (true/false)'
+    description: 'Whether to hide top header and telemetry counters in 3D city (true/false)'
     required: false
     default: 'false'
   hide-legend:
-    description: 'Whether to hide the bottom activity legend (true/false)'
+    description: 'Whether to hide bottom activity legend (true/false)'
     required: false
     default: 'false'
   animate:
@@ -79,6 +91,14 @@ outputs:
     description: 'Path to generated Language Matrix SVG'
   leetcode-svg-path:
     description: 'Path to generated LeetCode Telemetry SVG'
+  achievements-svg-path:
+    description: 'Path to generated Achievements & Trophies SVG'
+  velocity-svg-path:
+    description: 'Path to generated Commit Velocity Wave SVG'
+  radar-svg-path:
+    description: 'Path to generated Skills Radar SVG'
+  summary-svg-path:
+    description: 'Path to generated Executive Summary Banner SVG'
   total-contributions:
     description: 'Total number of contributions found'
   active-days:

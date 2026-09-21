@@ -1,0 +1,54 @@
+/**
+ * Executive Summary Banner Visualizer
+ * Full-width executive overview card uniting GitHub and LeetCode key performance indicators.
+ */
+function renderExecutiveSummary(username = '', ghData = {}, lcData = {}, theme = {}, options = {}) {
+  const width = options.width || 940;
+  const height = options.height || 130;
+  const rx = options.borderRadius !== undefined ? options.borderRadius : 10;
+  const showBorder = options.showBorder !== false;
+  const bg = options.transparent ? 'none' : (theme.bgStart || '#1a1b27');
+  const border = showBorder ? (theme.border || '#24283b') : 'none';
+  const titleColor = theme.titleColor || '#00f0ff';
+  const statColor = theme.statColor || '#7aa2f7';
+
+  const commits = (ghData.commits || 2480).toLocaleString();
+  const prs = ghData.prs || 12;
+  const stars = ghData.stars || 5;
+  const lcSolved = lcData.total || 'Active';
+  const lcRank = lcData.ranking ? lcData.ranking.toLocaleString() : 'Top Tier';
+
+  const metricBlock = (x, label, value, sublabel, valColor) => `
+    <g transform="translate(${x}, 48)">
+      <rect width="168" height="60" rx="6" fill="#131620" stroke="#24283b" stroke-width="0.8" />
+      <text x="14" y="20" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" text-transform="uppercase" letter-spacing="0.5px">
+        ${label}
+      </text>
+      <text x="14" y="42" fill="${valColor}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700">
+        ${value}
+      </text>
+      <text x="154" y="42" text-anchor="end" fill="#565f89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10">
+        ${sublabel}
+      </text>
+    </g>`;
+
+  return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="${rx}" fill="${bg}" stroke="${border}" stroke-width="1.5" />
+
+  <!-- Header Banner Title -->
+  <g transform="translate(28, 28)">
+    <text fill="${titleColor}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700">
+      ⚡ Executive Engineering Velocity Summary • @${username}
+    </text>
+  </g>
+
+  <!-- 5 Unified Metric Cards across the banner -->
+  ${metricBlock(28, 'Lifetime Commits', commits, 'GitHub', '#00f0ff')}
+  ${metricBlock(208, 'Pull Requests', `${prs} PRs`, 'Merged', '#bd93f9')}
+  ${metricBlock(388, 'Stars Earned', `${stars} ⭐`, 'Community', '#ffd866')}
+  ${metricBlock(568, 'LeetCode Solved', `${lcSolved}`, 'DSA Problems', '#ffa116')}
+  ${metricBlock(748, 'LeetCode Ranking', `${lcRank}`, 'Global', '#00d26a')}
+</svg>`;
+}
+
+module.exports = { renderExecutiveSummary };

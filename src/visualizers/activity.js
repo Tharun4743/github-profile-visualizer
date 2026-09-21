@@ -3,7 +3,7 @@ const https = require('https');
 function fetchJson(url, token) {
   return new Promise((resolve) => {
     const parsed = new URL(url);
-    const headers = { 'User-Agent': 'github-profile-3d-city-visualizer' };
+    const headers = { 'User-Agent': 'github-profile-visualizer' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
     const req = https.get(
@@ -118,14 +118,16 @@ function formatEvent(e) {
   }
 }
 
-async function renderActivityTimeline(username, token, theme = {}) {
+async function renderActivityTimeline(username, token, theme = {}, options = {}) {
   const eventsRaw = await fetchJson(`https://api.github.com/users/${username}/events/public?per_page=15`, token);
   const events = Array.isArray(eventsRaw) ? eventsRaw.slice(0, 5).map(formatEvent) : [];
 
-  const width = 467;
+  const width = options.width || 467;
   const height = 195;
-  const bg = theme.bgStart || '#1a1b27';
-  const border = theme.border || '#24283b';
+  const rx = options.borderRadius !== undefined ? options.borderRadius : 8;
+  const showBorder = options.showBorder !== false;
+  const bg = options.transparent ? 'none' : (theme.bgStart || '#1a1b27');
+  const border = showBorder ? (theme.border || '#24283b') : 'none';
   const titleColor = theme.titleColor || '#70a5fd';
 
   let itemsSvg = '';
@@ -151,7 +153,7 @@ async function renderActivityTimeline(username, token, theme = {}) {
   }
 
   return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="8" fill="${bg}" stroke="${border}" stroke-width="1.5" />
+  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="${rx}" fill="${bg}" stroke="${border}" stroke-width="1.5" />
   
   <!-- Header -->
   <g transform="translate(24, 30)">

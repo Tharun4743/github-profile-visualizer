@@ -156,6 +156,11 @@ function render3DCity(data, username, options = {}) {
     `
     : '';
 
+  const rx = options.borderRadius !== undefined ? options.borderRadius : 14;
+  const showBorder = options.showBorder !== false;
+  const bg = options.transparent ? 'none' : 'url(#bg-canvas)';
+  const border = showBorder ? theme.border : 'none';
+
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="100%" height="auto">
   <defs>
     <linearGradient id="bg-canvas" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -175,7 +180,7 @@ function render3DCity(data, username, options = {}) {
   </defs>
 
   <!-- Container Box -->
-  <rect width="${width}" height="${height}" rx="14" fill="url(#bg-canvas)" stroke="${theme.border}" stroke-width="1.5" />
+  <rect width="${width}" height="${height}" rx="${rx}" fill="${bg}" stroke="${border}" stroke-width="1.5" />
 
   ${headerSvg}
 

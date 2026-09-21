@@ -2,7 +2,7 @@
 
 # ⚡ GitHub Profile Visualizer
 
-### The all-in-one developer profile visualizer suite: 3D contribution city skylines, coding habits radar, recent activity stream, languages matrix, and LeetCode cards.
+### The ultimate all-in-one developer activity visualizer suite: 3D contribution city skylines, developer achievements, commit velocity waves, coding habits, competency radar, language matrix, and LeetCode cards.
 
 [![GitHub Marketplace](https://img.shields.io/badge/Marketplace-GitHub%20Profile%20Visualizer-purple?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/marketplace/actions/github-profile-visualizer)
 [![GitHub release](https://img.shields.io/github/v/release/Tharun4743/github-profile-visualizer?color=7aa2f7&style=for-the-badge)](https://github.com/Tharun4743/github-profile-visualizer/releases)
@@ -19,17 +19,44 @@
 
 ---
 
-## 🌟 The Visualizer Suite
+## 🌟 The 9-Visualizer Suite
 
-Generate **all your developer telemetry cards in a single, fast action run**:
+Generate **any or all developer telemetry cards in a single, fast action run**:
 
-| 🕒 Productive Coding Habits | ⚡ Live Activity Stream |
+### 1. Executive Summary Banner (Full Width)
+<img src="examples/executive-summary.svg" alt="Executive Summary" width="100%" />
+
+---
+
+### 2. Achievements & Momentum Wave
+| 🏆 Developer Achievements & Medals | 📈 Commit Velocity Wave Chart |
 | :---: | :---: |
-| ![Coding Habits](examples/coding-habits.svg) | ![Recent Activity](examples/activity-timeline.svg) |
+| ![Achievements](examples/achievements.svg) | ![Commit Velocity](examples/commit-velocity.svg) |
 
-| 💻 Language Distribution Matrix | 🧩 LeetCode Problem Solving Card |
+---
+
+### 3. Engineering Radar & Coding Habits
+| 🎯 Engineering Competency Radar | 🕒 Productive Coding Habits |
 | :---: | :---: |
-| ![Languages Matrix](examples/languages-matrix.svg) | ![LeetCode Card](examples/leetcode-card.svg) |
+| ![Competency Radar](examples/skills-radar.svg) | ![Coding Habits](examples/coding-habits.svg) |
+
+---
+
+### 4. Language Matrix & Live Activity Stream
+| 💻 Language Distribution Matrix | ⚡ Live Activity Stream |
+| :---: | :---: |
+| ![Languages Matrix](examples/languages-matrix.svg) | ![Recent Activity](examples/activity-timeline.svg) |
+
+---
+
+### 5. Competitive Programming Telemetry
+<div align="center">
+
+| 🧩 LeetCode Problem Solver Card |
+| :---: |
+| ![LeetCode Card](examples/leetcode-card.svg) |
+
+</div>
 
 ---
 
@@ -85,9 +112,10 @@ jobs:
         uses: Tharun4743/github-profile-visualizer@v1
         with:
           username: ${{ github.repository_owner }}
-          visualizers: 'all' # Generates 3D city, activity, habits, languages & leetcode
+          visualizers: 'all' # Generates all 9 visualizers in one pass
           theme: 'cyberpunk'
           leetcode-username: 'Tharunkumar__K'
+          transparent: false
           output-dir: 'assets'
 
       - name: Commit & Push Changes
@@ -107,14 +135,21 @@ jobs:
 ### Embed in Your Profile README
 
 ```html
+<!-- Executive Banner -->
+<img src="assets/executive-summary.svg" width="100%" alt="Executive Summary" />
+
 <!-- 3D Contribution City -->
 <img src="assets/profile-3d-city.svg" width="100%" alt="3D Contribution City" />
 
 <!-- 2x2 Telemetry Grid -->
 <table border="0" width="100%">
   <tr>
+    <td width="50%"><img src="assets/achievements.svg" width="100%" /></td>
+    <td width="50%"><img src="assets/commit-velocity.svg" width="100%" /></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="assets/skills-radar.svg" width="100%" /></td>
     <td width="50%"><img src="assets/coding-habits.svg" width="100%" /></td>
-    <td width="50%"><img src="assets/activity-timeline.svg" width="100%" /></td>
   </tr>
   <tr>
     <td width="50%"><img src="assets/languages-matrix.svg" width="100%" /></td>
@@ -130,9 +165,12 @@ jobs:
 | Input | Description | Required | Default |
 | :--- | :--- | :---: | :--- |
 | `username` | Target GitHub username | No | `${{ github.repository_owner }}` |
-| `visualizers`| Choice of visualizers: `'all'` or comma-separated (`'3d-city,activity,habits,languages,leetcode'`) | No | `'all'` |
-| `theme` | Built-in palette: `cyberpunk`, `tokyonight`, `dracula`, `nord`, `matrix`, `synthwave`, `monokai`, `sunset`, `github-dark`, `github-light` | No | `'cyberpunk'` |
+| `visualizers`| Choice of visualizers: `'all'` or comma-separated list (`'3d-city,activity,habits,languages,leetcode,achievements,velocity,radar,summary'`) | No | `'all'` |
+| `theme` | Built-in palette: `cyberpunk`, `tokyonight`, `dracula`, `nord`, `matrix`, `synthwave`, `monokai`, `sunset`, `github-dark`, `github-light`, `emerald` | No | `'cyberpunk'` |
 | `custom-colors` | 5 comma-separated hex codes for custom palette (`"#161b22,#0e4429,#006d32,#26a641,#39d353"`) | No | `''` |
+| `transparent` | Render transparent backgrounds for seamless dark/light theme integration (`true`/`false`) | No | `'false'` |
+| `border-radius`| Corner radius in pixels (`0`, `8`, `14`, `20`) | No | `''` |
+| `show-border` | Display card borders (`true`/`false`) | No | `'true'` |
 | `title` | Custom header title for the 3D City | No | `⚡ {username}'s 3D Contribution City` |
 | `height-scale`| Multiplier for 3D tower elevation (`1.0`, `1.5`, `2.0`) | No | `'1.0'` |
 | `animate` | Enable neon lighting reflection animation (`true`/`false`) | No | `'true'` |
@@ -148,6 +186,10 @@ jobs:
 | Output | Description |
 | :--- | :--- |
 | `svg-path` | Path to generated 3D City SVG |
+| `achievements-svg-path`| Path to generated Achievements & Medals SVG |
+| `velocity-svg-path`| Path to generated Commit Velocity Wave SVG |
+| `radar-svg-path` | Path to generated Competency Radar SVG |
+| `summary-svg-path` | Path to generated Executive Summary SVG |
 | `activity-svg-path` | Path to generated Recent Activity SVG |
 | `habits-svg-path` | Path to generated Coding Habits SVG |
 | `languages-svg-path` | Path to generated Language Matrix SVG |
@@ -160,14 +202,14 @@ jobs:
 ## 💻 CLI Usage
 
 ```bash
-# Generate the full visualizer suite
+# Generate all 9 visualizers
 npx github-profile-visualizer --username Tharun4743 --visualizers all --output ./assets
 
-# Generate only 3D City and Coding Habits in Dracula theme
-npx github-profile-visualizer --username Tharun4743 --visualizers "3d-city,habits" --theme dracula
+# Generate transparent cards with custom corner radius
+npx github-profile-visualizer --username Tharun4743 --visualizers "achievements,velocity,radar,summary" --transparent --border-radius 16
 
-# Generate with custom hex palette
-npx github-profile-visualizer --username Tharun4743 --custom-colors "#151515,#00d26a,#00f0ff,#bd93f9,#ff79c6"
+# Generate in Dracula theme with 1.5x 3D tower height
+npx github-profile-visualizer --username Tharun4743 --theme dracula --height-scale 1.5
 ```
 
 ---
@@ -175,7 +217,7 @@ npx github-profile-visualizer --username Tharun4743 --custom-colors "#151515,#00
 ## 🚀 How to Publish to GitHub Marketplace
 
 1. Navigate to: **[https://github.com/Tharun4743/github-profile-visualizer](https://github.com/Tharun4743/github-profile-visualizer)**.
-2. In the right-hand sidebar under **Releases**, click on **Releases** or edit the latest release **v1.2.0**.
+2. In the right-hand sidebar under **Releases**, click on **Releases** or edit the latest release **v1.3.0**.
 3. Check the box: **☑ "Publish this Action to the GitHub Marketplace"**.
 4. Select category: **Utilities** (and **Continuous Integration**).
 5. Click **Publish release**!

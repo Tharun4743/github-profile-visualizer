@@ -3,7 +3,7 @@ const https = require('https');
 function fetchJson(url, token) {
   return new Promise((resolve) => {
     const parsed = new URL(url);
-    const headers = { 'User-Agent': 'github-profile-3d-city-visualizer' };
+    const headers = { 'User-Agent': 'github-profile-visualizer' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
     const req = https.get(
@@ -52,7 +52,7 @@ const LANG_COLORS = {
   Other: '#8b949e',
 };
 
-async function renderLanguageMatrix(username, token, theme = {}) {
+async function renderLanguageMatrix(username, token, theme = {}, options = {}) {
   const reposRaw = await fetchJson(`https://api.github.com/users/${username}/repos?per_page=100`, token);
   const repos = Array.isArray(reposRaw) ? reposRaw : [];
 
@@ -73,24 +73,24 @@ async function renderLanguageMatrix(username, token, theme = {}) {
     .sort((a, b) => b.pct - a.pct)
     .slice(0, 5);
 
-  const width = 467;
+  const width = options.width || 467;
   const height = 195;
-  const bg = theme.bgStart || '#1a1b27';
-  const border = theme.border || '#24283b';
+  const rx = options.borderRadius !== undefined ? options.borderRadius : 8;
+  const showBorder = options.showBorder !== false;
+  const bg = options.transparent ? 'none' : (theme.bgStart || '#1a1b27');
+  const border = showBorder ? (theme.border || '#24283b') : 'none';
   const titleColor = theme.titleColor || '#7aa2f7';
 
-  // Build segmented progress bar
   const totalBarWidth = width - 48;
   let currentX = 24;
   let barRects = '';
   sorted.forEach((item, idx) => {
     const segWidth = Math.max(3, Math.round((item.pct / 100) * totalBarWidth));
-    const rx = idx === 0 ? 'rx="5"' : idx === sorted.length - 1 ? 'rx="5"' : '';
-    barRects += `<rect x="${currentX}" y="65" width="${segWidth}" height="14" ${rx} fill="${item.color}" />`;
+    const roundAttr = idx === 0 ? 'rx="5"' : idx === sorted.length - 1 ? 'rx="5"' : '';
+    barRects += `<rect x="${currentX}" y="65" width="${segWidth}" height="14" ${roundAttr} fill="${item.color}" />`;
     currentX += segWidth;
   });
 
-  // Build legend chips
   let chipsSvg = '';
   sorted.forEach((item, idx) => {
     const col = idx % 2;
@@ -111,7 +111,7 @@ async function renderLanguageMatrix(username, token, theme = {}) {
   });
 
   return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="8" fill="${bg}" stroke="${border}" stroke-width="1.5" />
+  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="${rx}" fill="${bg}" stroke="${border}" stroke-width="1.5" />
 
   <!-- Header -->
   <g transform="translate(24, 32)">
