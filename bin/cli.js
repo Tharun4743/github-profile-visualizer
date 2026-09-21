@@ -190,6 +190,9 @@ async function main() {
         fs.writeFileSync(filePath, svg, 'utf8');
         console.log(`✨ Generated: ${filePath}`);
       }
+      fs.writeFileSync(path.join(outDir, 'profile-night-view.svg'), render3DCity(calendarData, options.username, { ...options, ...universalOptions, theme: 'night-view' }), 'utf8');
+      fs.writeFileSync(path.join(outDir, 'profile-night-rainbow.svg'), render3DCity(calendarData, options.username, { ...options, ...universalOptions, theme: 'night-rainbow' }), 'utf8');
+      fs.writeFileSync(path.join(outDir, 'profile-green-animate.svg'), render3DCity(calendarData, options.username, { ...options, ...universalOptions, theme: 'night-green' }), 'utf8');
     } else {
       const svg = render3DCity(calendarData, options.username, { ...options, ...universalOptions });
       const filePath = path.join(outDir, options.filename);

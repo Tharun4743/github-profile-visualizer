@@ -1,6 +1,6 @@
 {
   "name": "github-profile-visualizer",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "All-in-one GitHub Profile Visualizer: 3D Contribution City, Coding Habits, Activity Stream, LeetCode, GFG, HackerRank & Duolingo Cards",
   "main": "src/index.js",
   "bin": {

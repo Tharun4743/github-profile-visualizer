@@ -1,7 +1,30 @@
 const https = require('https');
 
+const LANG_COLORS = {
+  TypeScript: '#3178c6',
+  JavaScript: '#f1e05a',
+  Python: '#3572A5',
+  Java: '#b07219',
+  HTML: '#e34c26',
+  CSS: '#563d7c',
+  Dart: '#00B4AB',
+  'C++': '#f34b7d',
+  C: '#555555',
+  'C#': '#178600',
+  Go: '#00ADD8',
+  Rust: '#dea584',
+  Kotlin: '#A97BFF',
+  Swift: '#F05138',
+  PHP: '#4F5D95',
+  Ruby: '#701516',
+  Shell: '#89e051',
+  Vue: '#41b883',
+  React: '#61dafb',
+  other: '#444444',
+};
+
 /**
- * Fetches daily contribution history for a given GitHub username.
+ * Fetches daily contribution history and rich profile telemetry for a given GitHub username.
  * Supports year selection, GitHub GraphQL API with token, and public scraper fallback.
  */
 async function fetchContributions(username, token, year = 'last-year') {
@@ -31,6 +54,7 @@ function fetchFromGraphQL(username, token, year) {
         user(login: $login) {
           contributionsCollection(${dateArgs}) {
             contributionCalendar {
+              isHalloween
               totalContributions
               weeks {
                 contributionDays {
@@ -39,6 +63,28 @@ function fetchFromGraphQL(username, token, year) {
                   contributionLevel
                 }
               }
+            }
+            totalCommitContributions
+            totalIssueContributions
+            totalPullRequestContributions
+            totalPullRequestReviewContributions
+            totalRepositoryContributions
+            commitContributionsByRepository(maxRepositories: 100) {
+              contributions {
+                totalCount
+              }
+              repository {
+                primaryLanguage {
+                  name
+                  color
+                }
+              }
+            }
+          }
+          repositories(first: 100, ownerAffiliations: OWNER, orderBy: {field: STARGAZERS, direction: DESC}) {
+            nodes {
+              forkCount
+              stargazerCount
             }
           }
         }
@@ -53,7 +99,7 @@ function fetchFromGraphQL(username, token, year) {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
-          'User-Agent': 'github-profile-3d-city',
+          'User-Agent': 'github-profile-visualizer',
           'Content-Type': 'application/json',
           'Content-Length': Buffer.byteLength(body),
         },
@@ -64,11 +110,15 @@ function fetchFromGraphQL(username, token, year) {
         res.on('end', () => {
           try {
             const parsed = JSON.parse(raw);
-            if (parsed.errors) {
+            if (parsed.errors && parsed.errors.length) {
               return reject(new Error(parsed.errors[0].message));
             }
-            const calendar = parsed.data?.user?.contributionsCollection?.contributionCalendar;
-            if (!calendar) return reject(new Error('User not found'));
+            const user = parsed.data?.user;
+            if (!user) return reject(new Error('User not found'));
+
+            const collection = user.contributionsCollection;
+            const calendar = collection?.contributionCalendar;
+            if (!calendar) return reject(new Error('Calendar not found'));
 
             const levelMap = {
               NONE: 0,
@@ -88,7 +138,47 @@ function fetchFromGraphQL(username, token, year) {
                 });
               }
             }
-            resolve({ days, total: calendar.totalContributions });
+
+            // Aggregate languages
+            const langMap = {};
+            if (collection.commitContributionsByRepository) {
+              collection.commitContributionsByRepository.forEach((repo) => {
+                if (repo.repository && repo.repository.primaryLanguage) {
+                  const name = repo.repository.primaryLanguage.name;
+                  const color = repo.repository.primaryLanguage.color || LANG_COLORS[name] || '#444444';
+                  const count = repo.contributions?.totalCount || 0;
+                  if (!langMap[name]) {
+                    langMap[name] = { language: name, color, contributions: 0 };
+                  }
+                  langMap[name].contributions += count;
+                }
+              });
+            }
+            const languages = Object.values(langMap).sort((a, b) => b.contributions - a.contributions);
+
+            // Aggregate stars & forks
+            let totalStars = 0;
+            let totalForks = 0;
+            if (user.repositories?.nodes) {
+              user.repositories.nodes.forEach((node) => {
+                totalStars += node.stargazerCount || 0;
+                totalForks += node.forkCount || 0;
+              });
+            }
+
+            resolve({
+              days,
+              total: calendar.totalContributions,
+              isHalloween: calendar.isHalloween || false,
+              totalCommitContributions: collection.totalCommitContributions || calendar.totalContributions,
+              totalIssueContributions: collection.totalIssueContributions || 0,
+              totalPullRequestContributions: collection.totalPullRequestContributions || 0,
+              totalPullRequestReviewContributions: collection.totalPullRequestReviewContributions || 0,
+              totalRepositoryContributions: collection.totalRepositoryContributions || 0,
+              languages,
+              totalStars,
+              totalForks,
+            });
           } catch (e) {
             reject(e);
           }
@@ -99,6 +189,53 @@ function fetchFromGraphQL(username, token, year) {
     req.on('error', reject);
     req.write(body);
     req.end();
+  });
+}
+
+function fetchPublicRepos(username) {
+  return new Promise((resolve) => {
+    https.get(
+      {
+        hostname: 'api.github.com',
+        path: `/users/${username}/repos?per_page=100`,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        },
+      },
+      (res) => {
+        let raw = '';
+        res.on('data', (c) => (raw += c));
+        res.on('end', () => {
+          try {
+            const list = JSON.parse(raw);
+            if (Array.isArray(list)) {
+              let totalStars = 0;
+              let totalForks = 0;
+              const langCount = {};
+              list.forEach((r) => {
+                totalStars += r.stargazers_count || 0;
+                totalForks += r.forks_count || 0;
+                if (r.language) {
+                  langCount[r.language] = (langCount[r.language] || 0) + 1;
+                }
+              });
+              const languages = Object.entries(langCount)
+                .map(([name, count]) => ({
+                  language: name,
+                  color: LANG_COLORS[name] || '#444444',
+                  contributions: count,
+                }))
+                .sort((a, b) => b.contributions - a.contributions);
+              resolve({ totalStars, totalForks, languages, repoCount: list.length });
+              return;
+            }
+          } catch (e) {
+            // ignore
+          }
+          resolve({ totalStars: 0, totalForks: 0, languages: [], repoCount: 0 });
+        });
+      }
+    ).on('error', () => resolve({ totalStars: 0, totalForks: 0, languages: [], repoCount: 0 }));
   });
 }
 
@@ -120,10 +257,10 @@ function fetchFromPublic(username, year) {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
       },
-      (res) => {
+      async (res) => {
         let html = '';
         res.on('data', (chunk) => (html += chunk));
-        res.on('end', () => {
+        res.on('end', async () => {
           const days = [];
           let total = 0;
           const regex = /data-date="(\d{4}-\d{2}-\d{2})"[^>]*?data-level="(\d+)"/g;
@@ -144,7 +281,21 @@ function fetchFromPublic(username, year) {
             total = days.reduce((sum, d) => sum + (d.count || 0), 0);
           }
 
-          resolve({ days, total });
+          const repoData = await fetchPublicRepos(username);
+
+          resolve({
+            days,
+            total,
+            isHalloween: false,
+            totalCommitContributions: total,
+            totalIssueContributions: 0,
+            totalPullRequestContributions: 0,
+            totalPullRequestReviewContributions: 0,
+            totalRepositoryContributions: repoData.repoCount,
+            languages: repoData.languages,
+            totalStars: repoData.totalStars,
+            totalForks: repoData.totalForks,
+          });
         });
       }
     ).on('error', reject);

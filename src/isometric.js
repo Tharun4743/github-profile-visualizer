@@ -1,201 +1,575 @@
-const { THEMES, createCustomTheme } = require('./themes');
+/**
+ * High-Fidelity 3D Isometric Contribution City Engine.
+ * Recreates the iconic yoshi389111/github-profile-3d-contrib architecture:
+ * - 1280x850 isometric canvas with 3D extruded contribution mesh
+ * - Animated 3-second rising blocks
+ * - 5-axis activity radar (Commit, Issue, PullReq, Review, Repo)
+ * - Animated language breakdown donut pie chart
+ * - Stargazer & fork metrics, total contribution counter, and date range
+ * - Multi-theme support (night-view, night-rainbow, night-green, cyberpunk, tokyonight, dracula, emerald)
+ * - Tharun4743 signature branding
+ */
+
+const ANGLE = 30;
+const RAD = Math.PI / 180;
+
+function toEpochDays(date) {
+  return Math.floor(date.getTime() / (24 * 60 * 60 * 1000));
+}
+
+function toIsoDate(date) {
+  return date.toISOString().split('T')[0];
+}
+
+function formatThousand(num) {
+  return (num || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function toScale(num) {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+  return (num || 0).toString();
+}
+
+// Color utility: darker multiplier mimicking d3.rgb.darker
+function shadeColor(color, factor) {
+  let r = 0, g = 0, b = 0;
+  if (color.startsWith('#')) {
+    const hex = color.slice(1);
+    if (hex.length === 3) {
+      r = parseInt(hex[0] + hex[0], 16);
+      g = parseInt(hex[1] + hex[1], 16);
+      b = parseInt(hex[2] + hex[2], 16);
+    } else {
+      r = parseInt(hex.slice(0, 2), 16);
+      g = parseInt(hex.slice(2, 4), 16);
+      b = parseInt(hex.slice(4, 6), 16);
+    }
+  } else if (color.startsWith('rgb')) {
+    const m = color.match(/\d+/g);
+    if (m) {
+      r = parseInt(m[0], 10);
+      g = parseInt(m[1], 10);
+      b = parseInt(m[2], 10);
+    }
+  }
+  r = Math.max(0, Math.min(255, Math.round(r * factor)));
+  g = Math.max(0, Math.min(255, Math.round(g * factor)));
+  b = Math.max(0, Math.min(255, Math.round(b * factor)));
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+// Built-in 3D Themes
+const THEME_CONFIGS = {
+  'night-view': {
+    type: 'normal',
+    backgroundColor: '#00000f',
+    foregroundColor: '#eeeeff',
+    strongColor: 'rgb(255, 200, 55)',
+    weakColor: '#aaaaaa',
+    radarColor: 'rgb(255, 200, 55)',
+    levels: [
+      'rgb(25, 60, 130)',
+      'rgb(25, 90, 210)',
+      'rgb(25, 120, 220)',
+      'rgb(25, 150, 230)',
+      'rgb(25, 165, 240)',
+    ],
+  },
+  'night-green': {
+    type: 'normal',
+    backgroundColor: '#00000f',
+    foregroundColor: '#eeeeff',
+    strongColor: '#26a641',
+    weakColor: '#aaaaaa',
+    radarColor: '#39d353',
+    levels: [
+      '#161b22',
+      '#0e4429',
+      '#006d32',
+      '#26a641',
+      '#39d353',
+    ],
+  },
+  green: {
+    type: 'normal',
+    backgroundColor: '#0d1117',
+    foregroundColor: '#e6edf3',
+    strongColor: '#39d353',
+    weakColor: '#8b949e',
+    radarColor: '#2ea043',
+    levels: [
+      '#161b22',
+      '#0e4429',
+      '#006d32',
+      '#26a641',
+      '#39d353',
+    ],
+  },
+  cyberpunk: {
+    type: 'normal',
+    backgroundColor: '#050811',
+    foregroundColor: '#00f0ff',
+    strongColor: '#ffe600',
+    weakColor: '#7000ff',
+    radarColor: '#ff007f',
+    levels: [
+      '#121b2f',
+      '#7928ca',
+      '#b800e6',
+      '#ff007f',
+      '#00f0ff',
+    ],
+  },
+  tokyonight: {
+    type: 'normal',
+    backgroundColor: '#1a1b26',
+    foregroundColor: '#c0caf5',
+    strongColor: '#ff9e64',
+    weakColor: '#565f89',
+    radarColor: '#7aa2f7',
+    levels: [
+      '#24283b',
+      '#3b4261',
+      '#7aa2f7',
+      '#bb9af7',
+      '#7dcfff',
+    ],
+  },
+  dracula: {
+    type: 'normal',
+    backgroundColor: '#282a36',
+    foregroundColor: '#f8f8f2',
+    strongColor: '#50fa7b',
+    weakColor: '#6272a4',
+    radarColor: '#ff79c6',
+    levels: [
+      '#343746',
+      '#6272a4',
+      '#bd93f9',
+      '#ff79c6',
+      '#50fa7b',
+    ],
+  },
+  emerald: {
+    type: 'normal',
+    backgroundColor: '#021812',
+    foregroundColor: '#e6fffa',
+    strongColor: '#34d399',
+    weakColor: '#047857',
+    radarColor: '#10b981',
+    levels: [
+      '#064e3b',
+      '#059669',
+      '#10b981',
+      '#34d399',
+      '#6ee7b7',
+    ],
+  },
+  'night-rainbow': {
+    type: 'rainbow',
+    backgroundColor: '#00000f',
+    foregroundColor: '#eeeeff',
+    strongColor: 'rgb(255, 200, 55)',
+    weakColor: '#aaaaaa',
+    radarColor: 'rgb(255, 200, 55)',
+    saturation: '50%',
+    duration: '10s',
+    hueRatio: -7,
+    contribLightness: ['20%', '30%', '40%', '50%', '60%'],
+  },
+};
 
 /**
- * Generates a Customizable Isometric 3D SVG City from daily contribution telemetry.
+ * Generates CSS rules for the 3D SVG.
  */
-function render3DCity(data, username, options = {}) {
-  const { days, total } = data;
-
-  // Determine theme
-  let theme = null;
-  if (options.customColors) {
-    theme = createCustomTheme(options.customColors, options.customBg || '#0d1117');
-  }
-  if (!theme) {
-    const themeKey = (options.theme || 'cyberpunk').toLowerCase();
-    theme = THEMES[themeKey] || THEMES.cyberpunk;
-  }
-
-  const heightScale = typeof options.heightScale === 'number' && !isNaN(options.heightScale) ? options.heightScale : 1.0;
-  const animate = options.animate !== false;
-  const hideHeader = options.hideHeader === true;
-  const hideLegend = options.hideLegend === true;
-  const customTitle = options.title || `⚡ ${username}'s 3D Contribution City`;
-
-  // Group into weeks of 7 days
-  const weeks = [];
-  let currentWeek = [];
-  days.forEach((day, i) => {
-    currentWeek.push(day);
-    if (currentWeek.length === 7 || i === days.length - 1) {
-      weeks.push(currentWeek);
-      currentWeek = [];
+function generateCss(themeConfig) {
+  const isRainbow = themeConfig.type === 'rainbow';
+  let css = `
+    * { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Helvetica", Arial, sans-serif; }
+    .fill-fg { fill: ${themeConfig.foregroundColor}; }
+    .stroke-fg { stroke: ${themeConfig.foregroundColor}; }
+    .fill-bg { fill: ${themeConfig.backgroundColor}; }
+    .stroke-bg { stroke: ${themeConfig.backgroundColor}; }
+    .fill-strong { fill: ${themeConfig.strongColor}; }
+    .fill-weak { fill: ${themeConfig.weakColor}; }
+    .stroke-weak { stroke: ${themeConfig.weakColor}; }
+    .radar {
+      stroke-width: 4px;
+      stroke: ${themeConfig.radarColor};
+      fill: ${themeConfig.radarColor};
+      fill-opacity: 0.5;
     }
+  `;
+
+  if (!isRainbow) {
+    themeConfig.levels.forEach((color, i) => {
+      const topColor = color;
+      const leftColor = shadeColor(color, 0.836);
+      const rightColor = shadeColor(color, 0.7);
+      css += `
+        .cont-top-${i} { fill: ${topColor}; }
+        .cont-left-${i} { fill: ${leftColor}; }
+        .cont-right-${i} { fill: ${rightColor}; }
+      `;
+    });
+  } else {
+    // Rainbow animation keyframes
+    const hues = [0, 60, 120, 180, 240, 300, 360];
+    const darkerList = [
+      ['top', 1.0],
+      ['left', 0.836],
+      ['right', 0.7],
+    ];
+
+    for (let level = 0; level < themeConfig.contribLightness.length; level++) {
+      const lightness = themeConfig.contribLightness[level];
+      for (const [faceName, factor] of darkerList) {
+        const className = `rb-l${level}-${faceName}`;
+        css += `.${className} { animation: ${className} ${themeConfig.duration} linear infinite; }\n`;
+        const stops = hues
+          .map((hue, i) => {
+            const pct = ((i / (hues.length - 1)) * 100).toFixed(2);
+            // approximate HSL to darker
+            return `${pct}% { fill: hsl(${hue}, ${themeConfig.saturation}, ${lightness}); }`;
+          })
+          .join(' ');
+        css += `@keyframes ${className} { ${stops} }\n`;
+      }
+    }
+  }
+
+  return css;
+}
+
+/**
+ * Calculates value for 5-axis radar chart.
+ */
+function toRadarLevel(value) {
+  if (value < 1) return 0.8;
+  const result = Math.log10(value);
+  return Math.min(result, 5) + 1;
+}
+
+/**
+ * Renders the 5-axis Activity Radar Chart.
+ */
+function renderRadar(radarX, radarY, radarWidth, radarHeight, telemetry, isAnimate) {
+  const levels = 5;
+  const rangeLabels = ['1', '10', '100', '1K', '10K'];
+  const radius = (radarHeight / 2) * 0.8;
+  const cx = radarWidth / 2;
+  const cy = (radarHeight / 2) * 1.1;
+  const radians = 2 * Math.PI;
+
+  const data = [
+    { name: 'Commit', value: telemetry.totalCommitContributions || telemetry.total || 0 },
+    { name: 'Issue', value: telemetry.totalIssueContributions || 0 },
+    { name: 'PullReq', value: telemetry.totalPullRequestContributions || 0 },
+    { name: 'Review', value: telemetry.totalPullRequestReviewContributions || 0 },
+    { name: 'Repo', value: telemetry.totalRepositoryContributions || 0 },
+  ];
+  const total = data.length;
+
+  const posX = (level, num) => (radius * (level / levels) * Math.sin((num / total) * radians)).toFixed(2);
+  const posY = (level, num) => (radius * (level / levels) * -Math.cos((num / total) * radians)).toFixed(2);
+
+  let out = `<g transform="translate(${radarX + cx}, ${radarY + cy})">\n`;
+
+  // Grid concentric pentagons
+  for (let j = 0; j < levels; j++) {
+    for (let i = 0; i < total; i++) {
+      const x1 = posX(j + 1, i);
+      const y1 = posY(j + 1, i);
+      const x2 = posX(j + 1, (i + 1) % total);
+      const y2 = posY(j + 1, (i + 1) % total);
+      out += `  <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="stroke-weak" style="stroke-dasharray: 4 4; stroke-width: 1px;"></line>\n`;
+    }
+  }
+
+  // Level numbers
+  rangeLabels.forEach((label, i) => {
+    out += `  <text x="${(radius / 50).toFixed(2)}" y="${(-radius * ((i + 1) / levels)).toFixed(2)}" style="font-size: ${(radius / 12).toFixed(2)}px;" text-anchor="start" dominant-baseline="auto" class="fill-weak">${label}</text>\n`;
   });
 
-  const width = 940;
-  const height = hideHeader ? 380 : 450;
-  const tileW = 14;
-  const tileH = 7;
-  const originX = 430;
-  const originY = hideHeader ? 20 : 55;
+  // Axes lines & labels
+  data.forEach((d, i) => {
+    const x1 = posX(1, i);
+    const y1 = posY(1, i);
+    const x2 = posX(levels, i);
+    const y2 = posY(levels, i);
+    const lx = posX(1.25 * levels, i);
+    const ly = posY(1.17 * levels, i);
 
-  const tiles = [];
-  for (let w = 0; w < weeks.length; w++) {
-    for (let d = 0; d < weeks[w].length; d++) {
-      const day = weeks[w][d];
-      const level = Math.min(4, Math.max(0, day.level || 0));
+    out += `  <g class="axis">\n`;
+    out += `    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="stroke-weak" style="stroke-dasharray: 4 4; stroke-width: 1px;"></line>\n`;
+    out += `    <text x="${lx}" y="${ly}" style="font-size: ${(radius / 7.5).toFixed(2)}px;" text-anchor="middle" dominant-baseline="middle" class="fill-fg">${d.name}<title>${d.value}</title></text>\n`;
+    out += `  </g>\n`;
+  });
 
-      const x = originX + (w * (tileW / 2)) - (d * tileW);
-      const y = originY + (w * (tileH / 2)) + (d * tileH);
+  // Radar Polygon
+  const points = data.map((d, i) => `${posX(toRadarLevel(d.value), i)},${posY(toRadarLevel(d.value), i)}`).join(' ');
+  const points0 = data.map((d, i) => `${posX(0.8, i)},${posY(0.8, i)}`).join(' ');
 
-      let pillarHeight = 3;
-      if (level > 0) {
-        pillarHeight = (level * 10 + Math.min(32, (day.count || level) * 2.2)) * heightScale;
-      }
+  out += `  <polygon class="radar" points="${points}">\n`;
+  if (isAnimate) {
+    out += `    <animate attributeName="points" values="${points0};${points}" dur="3s" repeatCount="1"></animate>\n`;
+  }
+  out += `  </polygon>\n`;
+  out += `</g>\n`;
 
-      tiles.push({
-        w,
-        d,
-        x,
-        y,
-        pillarHeight,
-        level,
-        day,
-        depth: y + (x * 0.001),
-      });
+  return out;
+}
+
+/**
+ * Renders the Language Donut Pie Chart with animated arc segments and legend.
+ */
+function renderLanguageDonut(pieX, pieY, pieWidth, pieHeight, languages, totalCommits, isAnimate) {
+  if (!languages || languages.length === 0) return '';
+
+  const topLangs = languages.slice(0, 5);
+  const sumCount = topLangs.reduce((a, b) => a + (b.contributions || 0), 0);
+  const otherCount = Math.max(0, (totalCommits || sumCount) - sumCount);
+  if (otherCount > 0) {
+    topLangs.push({ language: 'other', color: '#444444', contributions: otherCount });
+  }
+
+  const grandTotal = topLangs.reduce((a, b) => a + b.contributions, 0) || 1;
+  const radius = pieHeight / 2;
+  const margin = radius / 10;
+  const outerR = radius - margin;
+  const innerR = radius / 2;
+  const row = 8;
+  const offset = (row - topLangs.length) / 2 + 0.5;
+  const fontSize = pieHeight / row / 1.5;
+
+  let out = `<g transform="translate(${pieX}, ${pieY})">\n`;
+
+  // Legend markers & labels
+  out += `  <g transform="translate(${radius * 2.1}, 0)">\n`;
+  topLangs.forEach((lang, i) => {
+    const y = (i + offset) * (pieHeight / row);
+    out += `    <rect x="0" y="${(y - fontSize / 2).toFixed(2)}" width="${fontSize.toFixed(2)}" height="${fontSize.toFixed(2)}" fill="${lang.color}" class="stroke-bg" stroke-width="1px">\n`;
+    if (isAnimate) {
+      out += `      <animate attributeName="fill-opacity" values="0;${(i + 1) * 0.2};1" dur="3s" repeatCount="1"></animate>\n`;
     }
+    out += `    </rect>\n`;
+    out += `    <text x="${(fontSize * 1.2).toFixed(2)}" y="${y.toFixed(2)}" dominant-baseline="middle" font-size="${fontSize.toFixed(2)}px" class="fill-fg">${lang.language}\n`;
+    if (isAnimate) {
+      out += `      <animate attributeName="fill-opacity" values="0;${(i + 1) * 0.2};1" dur="3s" repeatCount="1"></animate>\n`;
+    }
+    out += `    </text>\n`;
+  });
+  out += `  </g>\n`;
+
+  // Donut Arcs
+  out += `  <g transform="translate(${radius}, ${radius})">\n`;
+  let currentAngle = 0;
+  topLangs.forEach((lang) => {
+    const sliceAngle = (lang.contributions / grandTotal) * 2 * Math.PI;
+    const startAngle = currentAngle;
+    const endAngle = currentAngle + sliceAngle;
+    currentAngle = endAngle;
+
+    // SVG arc path
+    const x1 = (Math.sin(startAngle) * outerR).toFixed(3);
+    const y1 = (-Math.cos(startAngle) * outerR).toFixed(3);
+    const x2 = (Math.sin(endAngle) * outerR).toFixed(3);
+    const y2 = (-Math.cos(endAngle) * outerR).toFixed(3);
+    const x3 = (Math.sin(endAngle) * innerR).toFixed(3);
+    const y3 = (-Math.cos(endAngle) * innerR).toFixed(3);
+    const x4 = (Math.sin(startAngle) * innerR).toFixed(3);
+    const y4 = (-Math.cos(startAngle) * innerR).toFixed(3);
+
+    const largeArc = sliceAngle > Math.PI ? 1 : 0;
+    const d = `M ${x1} ${y1} A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerR} ${innerR} 0 ${largeArc} 0 ${x4} ${y4} Z`;
+
+    out += `    <path d="${d}" style="fill: ${lang.color};" class="stroke-bg" stroke-width="2px">\n`;
+    out += `      <title>${lang.language} ${lang.contributions}</title>\n`;
+    if (isAnimate) {
+      out += `      <animate attributeName="fill-opacity" values="0;0.5;1" dur="3s" repeatCount="1"></animate>\n`;
+    }
+    out += `    </path>\n`;
+  });
+  out += `  </g>\n`;
+  out += `</g>\n`;
+
+  return out;
+}
+
+/**
+ * Primary Export: Renders the Full 1280x850 3D Contribution City SVG.
+ */
+function render3DCity(telemetry, username, options = {}) {
+  const days = telemetry.days || [];
+  const total = telemetry.total || 0;
+  const isAnimate = options.animate !== false;
+
+  // Resolve theme
+  const themeInput = (options.theme || 'night-view').toLowerCase();
+  let themeConfig = THEME_CONFIGS[themeInput] || THEME_CONFIGS['night-view'];
+  if (options.customColors && options.customColors.length >= 5) {
+    themeConfig = {
+      type: 'normal',
+      backgroundColor: options.customBg || '#00000f',
+      foregroundColor: '#eeeeff',
+      strongColor: options.customColors[4] || 'rgb(255, 200, 55)',
+      weakColor: '#aaaaaa',
+      radarColor: options.customColors[3] || 'rgb(255, 200, 55)',
+      levels: options.customColors.slice(0, 5),
+    };
   }
 
-  // Painter's algorithm sort
-  tiles.sort((a, b) => a.depth - b.depth);
-  const activeDays = days.filter((d) => (d.level || 0) > 0).length;
+  const width = 1280;
+  const height = 850;
 
-  let pillarsSvg = '';
-  for (let idx = 0; idx < tiles.length; idx++) {
-    const tile = tiles[idx];
-    const { x, y, pillarHeight, level, day } = tile;
-    const colors = theme.levels[level] || theme.levels[0];
-
-    const topX = x;
-    const topY = y - pillarHeight;
-    const rightX = x + tileW / 2;
-    const rightY = y + tileH / 2 - pillarHeight;
-    const bottomX = x;
-    const bottomY = y + tileH - pillarHeight;
-    const leftX = x - tileW / 2;
-    const leftY = y + tileH / 2 - pillarHeight;
-
-    const baseBottomY = y + tileH;
-    const baseLeftY = y + tileH / 2;
-    const baseRightY = y + tileH / 2;
-
-    const leftWall = `${leftX},${leftY} ${bottomX},${bottomY} ${bottomX},${baseBottomY} ${leftX},${baseLeftY}`;
-    const rightWall = `${bottomX},${bottomY} ${rightX},${rightY} ${rightX},${baseRightY} ${bottomX},${baseBottomY}`;
-    const roof = `${topX},${topY} ${rightX},${rightY} ${bottomX},${bottomY} ${leftX},${leftY}`;
-
-    const tooltip = `${day.date}: ${day.count || (level > 0 ? '1+' : '0')} commits`;
-    const animClass = animate && level >= 3 ? ' tower glow-pulse' : ' tower';
-
-    pillarsSvg += `
-      <g class="${animClass}" tabindex="0">
-        <title>${tooltip}</title>
-        <polygon points="${leftWall}" fill="${colors.left}" />
-        <polygon points="${rightWall}" fill="${colors.right}" />
-        <polygon points="${roof}" fill="${colors.top}" />
-      </g>`;
+  if (days.length === 0) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><text x="50%" y="50%" fill="#fff" text-anchor="middle">No Contribution Data Available</text></svg>`;
   }
 
-  // Header and Legend templates
-  const headerSvg = hideHeader
-    ? ''
-    : `
-  <!-- Header Section -->
-  <g transform="translate(36, 42)">
-    <text fill="${theme.titleColor}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700">
-      ${customTitle}
-    </text>
-    <text y="22" fill="${theme.subtitleColor}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">
-      ${theme.name} • 3D Isometric Telemetry
-    </text>
+  // Projection setup
+  const firstDate = new Date(days[0].date);
+  const firstUTCDay = firstDate.getUTCDay();
+  const sundayOfFirstWeek = toEpochDays(firstDate) - firstUTCDay;
+  const weekcount = Math.ceil((days.length + firstUTCDay) / 7.0);
+
+  const dx = width / 64; // 20
+  const dy = dx * Math.tan(ANGLE * RAD); // 11.547
+  const dxx = dx * 0.9; // 18
+  const dyy = dy * 0.9; // 10.392
+
+  const offsetX = dx * 7; // 140
+  const offsetY = height - (weekcount + 7) * dy;
+
+  const scaleLeft = Math.sqrt(dxx * dxx + dyy * dyy) / dxx; // ≈ 1.1547
+  const scaleRight = scaleLeft;
+
+  // Render 3D Cubes
+  let cubesSvg = '';
+  days.forEach((day) => {
+    const curDate = new Date(day.date);
+    const week = Math.floor((toEpochDays(curDate) - sundayOfFirstWeek) / 7);
+    const dayOfWeek = curDate.getUTCDay();
+
+    const baseX = offsetX + (week - dayOfWeek) * dx;
+    const baseY = offsetY + (week + dayOfWeek) * dy;
+    const calHeight = Math.log10((day.count || 0) / 20 + 1) * 144 + 3;
+    const contribLevel = Math.min(4, Math.max(0, day.level || 0));
+
+    const heightLeft = calHeight / scaleLeft;
+    const heightRight = heightLeft;
+
+    let classTop = `cont-top-${contribLevel}`;
+    let classLeft = `cont-left-${contribLevel}`;
+    let classRight = `cont-right-${contribLevel}`;
+    let styleTop = '', styleLeft = '', styleRight = '';
+
+    if (themeConfig.type === 'rainbow') {
+      const offsetHue = week * themeConfig.hueRatio;
+      const normalizedHue = ((offsetHue % 360) + 360) % 360;
+      const durationSeconds = parseFloat(themeConfig.duration);
+      const delaySeconds = (-(normalizedHue / 360) * durationSeconds).toFixed(3);
+
+      classTop = `rb-l${contribLevel}-top`;
+      classLeft = `rb-l${contribLevel}-left`;
+      classRight = `rb-l${contribLevel}-right`;
+      styleTop = ` style="animation-delay: ${delaySeconds}s;"`;
+      styleLeft = ` style="animation-delay: ${delaySeconds}s;"`;
+      styleRight = ` style="animation-delay: ${delaySeconds}s;"`;
+    }
+
+    cubesSvg += `<g transform="translate(${baseX.toFixed(2)} ${(baseY - calHeight).toFixed(2)})">\n`;
+    if (isAnimate && contribLevel !== 0) {
+      cubesSvg += `  <animateTransform attributeName="transform" type="translate" values="${baseX.toFixed(2)} ${(baseY - 3).toFixed(2)};${baseX.toFixed(2)} ${(baseY - calHeight).toFixed(2)}" dur="3s" repeatCount="1"></animateTransform>\n`;
+    }
+
+    // Top face
+    cubesSvg += `  <rect stroke="none" x="0" y="0" width="${dxx}" height="${dxx}" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="${classTop}"${styleTop}></rect>\n`;
+
+    // Left face
+    cubesSvg += `  <rect stroke="none" x="0" y="0" width="${dxx}" height="${heightLeft.toFixed(2)}" transform="skewY(30) scale(1 1.15)" class="${classLeft}"${styleLeft}>\n`;
+    if (isAnimate && contribLevel !== 0) {
+      cubesSvg += `    <animate attributeName="height" values="${(3 / scaleLeft).toFixed(2)};${heightLeft.toFixed(2)}" dur="3s" repeatCount="1"></animate>\n`;
+    }
+    cubesSvg += `  </rect>\n`;
+
+    // Right face
+    cubesSvg += `  <rect stroke="none" x="0" y="0" width="${dxx}" height="${heightRight.toFixed(2)}" transform="translate(${dxx} ${dyy.toFixed(2)}) skewY(-30) scale(1 1.15)" class="${classRight}"${styleRight}>\n`;
+    if (isAnimate && contribLevel !== 0) {
+      cubesSvg += `    <animate attributeName="height" values="${(3 / scaleRight).toFixed(2)};${heightRight.toFixed(2)}" dur="3s" repeatCount="1"></animate>\n`;
+    }
+    cubesSvg += `  </rect>\n`;
+    cubesSvg += `</g>\n`;
+  });
+
+  // Radar Chart dimensions
+  const radarWidth = 520;
+  const radarHeight = 390;
+  const radarX = width - radarWidth - 40;
+  const radarY = 70;
+  const radarSvg = renderRadar(radarX, radarY, radarWidth, radarHeight, telemetry, isAnimate);
+
+  // Language Pie Chart dimensions
+  const pieHeight = 260;
+  const pieWidth = 520;
+  const pieX = 40;
+  const pieY = height - pieHeight - 70;
+  const langSvg = renderLanguageDonut(pieX, pieY, pieWidth, pieHeight, telemetry.languages || [], telemetry.totalCommitContributions || total, isAnimate);
+
+  // Date Range
+  const startDate = days[0].date;
+  const endDate = days[days.length - 1].date;
+  const period = `${startDate} / ${endDate}`;
+
+  // Metrics Bar
+  const positionXContrib = Math.round((width * 3) / 10);
+  const positionYContrib = height - 20;
+  const positionXStar = Math.round((width * 5) / 10);
+  const positionXFork = Math.round((width * 6) / 10);
+
+  const starCount = telemetry.totalStars || 0;
+  const forkCount = telemetry.totalForks || 0;
+
+  const starIcon = `<path fill-rule="evenodd" d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25zm0 2.445L6.615 5.5a.75.75 0 01-.564.41l-3.097.45 2.24 2.184a.75.75 0 01.216.664l-.528 3.084 2.769-1.456a.75.75 0 01.698 0l2.77 1.456-.53-3.084a.75.75 0 01.216-.664l2.24-2.183-3.096-.45a.75.75 0 01-.564-.41L8 2.694v.001z" class="fill-fg"></path>`;
+  const forkIcon = `<path fill-rule="evenodd" d="M5 3.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm0 2.122a2.25 2.25 0 10-1.5 0v.878A2.25 2.25 0 005.75 8.5h1.5v2.128a2.251 2.251 0 101.5 0V8.5h1.5a2.25 2.25 0 002.25-2.25v-.878a2.25 2.25 0 10-1.5 0v.878a.75.75 0 01-.75.75h-4.5A.75.75 0 015 6.25v-.878zm3.75 7.378a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm3-8.75a.75.75 0 100-1.5.75.75 0 000 1.5z" class="fill-fg"></path>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+<style>${generateCss(themeConfig)}</style>
+<rect x="0" y="0" width="${width}" height="${height}" class="fill-bg"></rect>
+
+<!-- 3D Contribution Grid Terrain -->
+<g>
+${cubesSvg}
+</g>
+
+<!-- 5-Axis Activity Radar -->
+${radarSvg}
+
+<!-- Language Breakdown Donut Chart -->
+${langSvg}
+
+<!-- Telemetry & Metrics Summary -->
+<g>
+  <text style="font-size: 32px; font-weight: bold;" x="${positionXContrib}" y="${positionYContrib}" text-anchor="end" class="fill-strong">${formatThousand(total)}</text>
+  <text style="font-size: 24px;" x="${positionXContrib + 10}" y="${positionYContrib}" text-anchor="start" class="fill-fg">contributions</text>
+
+  <g transform="translate(${positionXStar - 32}, ${positionYContrib - 28}), scale(2)">
+    ${starIcon}
   </g>
+  <text style="font-size: 32px; font-weight: bold;" x="${positionXStar + 10}" y="${positionYContrib}" text-anchor="start" class="fill-fg">${toScale(starCount)}<title>${starCount} stars</title></text>
 
-  <!-- Telemetry Badges -->
-  <g transform="translate(620, 28)">
-    <g transform="translate(0, 0)">
-      <text class="stat-label">Total Commits</text>
-      <text y="20" class="stat-value">${total.toLocaleString()}</text>
-    </g>
-    <g transform="translate(140, 0)">
-      <text class="stat-label">Active Days</text>
-      <text y="20" class="stat-value">${activeDays} days</text>
-    </g>
-  </g>`;
-
-  const legendSvg = hideLegend
-    ? ''
-    : `
-  <!-- Legend in Footer -->
-  <g transform="translate(36, ${height - 24})">
-    <text fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="10">Less</text>
-    <rect x="32" y="-9" width="10" height="10" rx="2" fill="${theme.levels[0].top}" stroke="${theme.border}" stroke-width="0.5" />
-    <rect x="46" y="-9" width="10" height="10" rx="2" fill="${theme.levels[1].top}" />
-    <rect x="60" y="-9" width="10" height="10" rx="2" fill="${theme.levels[2].top}" />
-    <rect x="74" y="-9" width="10" height="10" rx="2" fill="${theme.levels[3].top}" />
-    <rect x="88" y="-9" width="10" height="10" rx="2" fill="${theme.levels[4].top}" />
-    <text x="104" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="10">More</text>
-  </g>`;
-
-  const animationCss = animate
-    ? `
-      @keyframes neon-sweep {
-        0%, 100% { filter: brightness(1); }
-        50% { filter: brightness(1.22) drop-shadow(0 0 5px ${theme.titleColor}); }
-      }
-      .glow-pulse { animation: neon-sweep 4s ease-in-out infinite; }
-    `
-    : '';
-
-  const rx = options.borderRadius !== undefined ? options.borderRadius : 14;
-  const showBorder = options.showBorder !== false;
-  const bg = options.transparent ? 'none' : 'url(#bg-canvas)';
-  const border = showBorder ? theme.border : 'none';
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="100%" height="auto">
-  <defs>
-    <linearGradient id="bg-canvas" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="${theme.bgStart}" />
-      <stop offset="100%" stop-color="${theme.bgEnd}" />
-    </linearGradient>
-    <filter id="city-glow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="${theme.titleColor}" flood-opacity="0.16" />
-    </filter>
-    <style>
-      .tower { transition: transform 0.2s ease, filter 0.2s ease; cursor: pointer; }
-      .tower:hover { filter: brightness(1.4) drop-shadow(0 0 8px ${theme.titleColor}); }
-      .stat-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; fill: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
-      .stat-value { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; font-weight: 700; fill: ${theme.statColor}; }
-      ${animationCss}
-    </style>
-  </defs>
-
-  <!-- Container Box -->
-  <rect width="${width}" height="${height}" rx="${rx}" fill="${bg}" stroke="${border}" stroke-width="1.5" />
-
-  ${headerSvg}
-
-  <!-- Isometric 3D Projection -->
-  <g transform="translate(0, ${hideHeader ? 30 : 48})" filter="url(#city-glow)">
-    ${pillarsSvg}
+  <g transform="translate(${positionXFork - 32}, ${positionYContrib - 28}), scale(2)">
+    ${forkIcon}
   </g>
+  <text style="font-size: 32px; font-weight: bold;" x="${positionXFork + 4}" y="${positionYContrib}" text-anchor="start" class="fill-fg">${toScale(forkCount)}<title>${forkCount} forks</title></text>
 
-  ${legendSvg}
+  <!-- Date Range -->
+  <text style="font-size: 16px;" x="${width - 20}" y="20" dominant-baseline="hanging" text-anchor="end" class="fill-weak">${period}</text>
 
-  <!-- Personal Branding Watermark -->
-  <a href="https://github.com/Tharun4743/github-profile-visualizer" target="_blank">
-    <text x="${width - 36}" y="${height - 24}" text-anchor="end" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" opacity="0.85">⚡ by @Tharun4743</text>
-  </a>
+  <!-- Signature Branding -->
+  <text style="font-size: 13px; font-weight: 600; opacity: 0.75; letter-spacing: 0.5px;" x="${width - 20}" y="${height - 20}" text-anchor="end" class="fill-fg">⚡ by @${username}</text>
+</g>
 </svg>`;
 }
 
-module.exports = { render3DCity };
+module.exports = { render3DCity, THEME_CONFIGS };

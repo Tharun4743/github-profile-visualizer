@@ -179,6 +179,54 @@ const THEMES = {
       { top: '#26a641', left: '#1c7d31', right: '#145923' }, // 3
       { top: '#39d353', left: '#2ba440', right: '#1e752d' }  // 4
     ]
+  },
+  'night-view': {
+    name: 'Night View Gold',
+    bgStart: '#00000f',
+    bgEnd: '#05051a',
+    border: '#193c82',
+    titleColor: 'rgb(255, 200, 55)',
+    subtitleColor: '#8be9fd',
+    statColor: 'rgb(255, 200, 55)',
+    levels: [
+      { top: '#193c82', left: '#15326d', right: '#122a5b' },
+      { top: '#195ad2', left: '#154bb0', right: '#123f93' },
+      { top: '#1978dc', left: '#1564b8', right: '#12549a' },
+      { top: '#1996e6', left: '#157dc0', right: '#1269a1' },
+      { top: '#19a5f0', left: '#158ac9', right: '#1273a8' }
+    ]
+  },
+  'night-rainbow': {
+    name: 'Night Rainbow',
+    bgStart: '#00000f',
+    bgEnd: '#08081f',
+    border: '#bd93f9',
+    titleColor: '#ff79c6',
+    subtitleColor: '#8be9fd',
+    statColor: 'rgb(255, 200, 55)',
+    levels: [
+      { top: '#282e44', left: '#1f2334', right: '#181b28' },
+      { top: '#bd93f9', left: '#926fd1', right: '#684aa3' },
+      { top: '#00f0ff', left: '#00b4c0', right: '#007c85' },
+      { top: '#ffb86c', left: '#d48d42', right: '#9c6227' },
+      { top: '#ff79c6', left: '#cf549d', right: '#9b3572' }
+    ]
+  },
+  'night-green': {
+    name: 'Night Green',
+    bgStart: '#00000f',
+    bgEnd: '#03140a',
+    border: '#26a641',
+    titleColor: '#39d353',
+    subtitleColor: '#7ee787',
+    statColor: '#26a641',
+    levels: [
+      { top: '#161b22', left: '#0d1117', right: '#010409' },
+      { top: '#0e4429', left: '#0a321e', right: '#062013' },
+      { top: '#006d32', left: '#005226', right: '#003719' },
+      { top: '#26a641', left: '#1d7c31', right: '#145321' },
+      { top: '#39d353', left: '#2ba440', right: '#1e752d' }
+    ]
   }
 };
 

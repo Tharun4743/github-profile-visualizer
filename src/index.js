@@ -107,6 +107,10 @@ async function run() {
           const tSvg = render3DCity(calendarData, username, { ...universalOptions, theme: tKey, heightScale, animate });
           fs.writeFileSync(path.join(resolvedDir, `profile-3d-${tKey}.svg`), tSvg, 'utf8');
         }
+        // Yoshi389111 compatibility aliases
+        fs.writeFileSync(path.join(resolvedDir, 'profile-night-view.svg'), render3DCity(calendarData, username, { ...universalOptions, theme: 'night-view', animate }), 'utf8');
+        fs.writeFileSync(path.join(resolvedDir, 'profile-night-rainbow.svg'), render3DCity(calendarData, username, { ...universalOptions, theme: 'night-rainbow', animate }), 'utf8');
+        fs.writeFileSync(path.join(resolvedDir, 'profile-green-animate.svg'), render3DCity(calendarData, username, { ...universalOptions, theme: 'night-green', animate }), 'utf8');
       }
     }
 
