@@ -48,6 +48,11 @@ function renderExecutiveSummary(username = '', ghData = {}, lcData = {}, theme =
   ${metricBlock(388, 'Stars Earned', `${stars} ⭐`, 'Community', '#ffd866')}
   ${metricBlock(568, 'LeetCode Solved', `${lcSolved}`, 'DSA Problems', '#ffa116')}
   ${metricBlock(748, 'LeetCode Ranking', `${lcRank}`, 'Global', '#00d26a')}
+
+  <!-- Personal Branding Watermark -->
+  <a href="https://github.com/Tharun4743/github-profile-visualizer" target="_blank">
+    <text x="${width - 28}" y="32" text-anchor="end" fill="#565f89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" opacity="0.85">⚡ by @Tharun4743</text>
+  </a>
 </svg>`;
 }
 

@@ -190,6 +190,11 @@ function render3DCity(data, username, options = {}) {
   </g>
 
   ${legendSvg}
+
+  <!-- Personal Branding Watermark -->
+  <a href="https://github.com/Tharun4743/github-profile-visualizer" target="_blank">
+    <text x="${width - 36}" y="${height - 24}" text-anchor="end" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" opacity="0.85">⚡ by @Tharun4743</text>
+  </a>
 </svg>`;
 }
 

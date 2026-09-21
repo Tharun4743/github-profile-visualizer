@@ -91,6 +91,11 @@ function renderSkillsRadar(username = '', theme = {}, options = {}) {
 
   <!-- Data Filled Polygon -->
   <polygon points="${polygonPts.trim()}" fill="url(#radar-glow)" stroke="${radarColor}" stroke-width="2" />
+
+  <!-- Personal Branding Watermark -->
+  <a href="https://github.com/Tharun4743/github-profile-visualizer" target="_blank">
+    <text x="${width - 24}" y="${height - 10}" text-anchor="end" fill="#565f89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="600" opacity="0.85">⚡ by @Tharun4743</text>
+  </a>
 </svg>`;
 }
 

@@ -95,9 +95,14 @@ async function renderCodingHabits(username, token, theme = {}, options = {}) {
   ${bar(nPct, '#ff79c6', 136, 'Night Owl (00-06)', '🌙')}
 
   <!-- Footer Tip -->
-  <text x="${width - 24}" y="${height - 16}" text-anchor="end" fill="#565f89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="10">
+  <text x="24" y="${height - 12}" fill="#565f89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="9">
     Computed from recent activity telemetry
   </text>
+
+  <!-- Personal Branding Watermark -->
+  <a href="https://github.com/Tharun4743/github-profile-visualizer" target="_blank">
+    <text x="${width - 24}" y="${height - 12}" text-anchor="end" fill="#565f89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="600" opacity="0.85">⚡ by @Tharun4743</text>
+  </a>
 </svg>`;
 }
 
