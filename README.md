@@ -214,16 +214,6 @@ npx github-profile-visualizer --username Tharun4743 --theme dracula --height-sca
 
 ---
 
-## 🚀 How to Publish to GitHub Marketplace
-
-1. Navigate to: **[https://github.com/Tharun4743/github-profile-visualizer](https://github.com/Tharun4743/github-profile-visualizer)**.
-2. In the right-hand sidebar under **Releases**, click on **Releases** or edit the latest release **v1.3.0**.
-3. Check the box: **☑ "Publish this Action to the GitHub Marketplace"**.
-4. Select category: **Utilities** (and **Continuous Integration**).
-5. Click **Publish release**!
-
----
-
 ## 📄 License
 
 Distributed under the [MIT License](LICENSE). Built with ❤️ by [@Tharun4743](https://github.com/Tharun4743).
