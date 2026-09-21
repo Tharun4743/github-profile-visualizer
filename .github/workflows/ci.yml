@@ -1,0 +1,37 @@
+name: CI & Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Build & Test CLI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test CLI generation
+        run: |
+          node bin/cli.js --username Tharun4743 --theme cyberpunk --output ./test-out
+          test -f ./test-out/profile-3d-city.svg
+          echo "CLI test passed successfully!"
+
+      - name: Verify build bundle
+        run: |
+          npm run build
+          git diff --exit-code dist/ || (echo "dist/index.js is out of date! Run npm run build and commit." && exit 1)
