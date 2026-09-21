@@ -2,7 +2,7 @@
 
 # ⚡ GitHub Profile Visualizer
 
-### The ultimate all-in-one developer activity visualizer suite: 3D contribution city skylines, developer achievements, commit velocity waves, coding habits, competency radar, language matrix, and LeetCode cards.
+### The ultimate all-in-one developer activity visualizer suite: 3D contribution city skylines, developer achievements, commit velocity waves, coding habits, competency radar, language matrix, LeetCode, GeeksforGeeks, HackerRank, and Duolingo cards.
 
 [![GitHub Marketplace](https://img.shields.io/badge/Marketplace-GitHub%20Profile%20Visualizer-purple?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/marketplace/actions/github-profile-visualizer)
 [![GitHub release](https://img.shields.io/github/v/release/Tharun4743/github-profile-visualizer?color=7aa2f7&style=for-the-badge)](https://github.com/Tharun4743/github-profile-visualizer/releases)
@@ -49,12 +49,16 @@ Generate **any or all developer telemetry cards in a single, fast action run**:
 
 ---
 
-### 5. Competitive Programming Telemetry
+### 5. Multi-Platform Problem Solving & Learning Telemetry
 <div align="center">
 
-| 🧩 LeetCode Problem Solver Card |
-| :---: |
-| ![LeetCode Card](examples/leetcode-card.svg) |
+| 🧩 LeetCode Card | 🌿 GeeksforGeeks Card |
+| :---: | :---: |
+| ![LeetCode Card](examples/leetcode-card.svg) | ![GeeksforGeeks Card](examples/gfg-card.svg) |
+
+| 🎖️ HackerRank Card | 🦉 Duolingo Learning Streak |
+| :---: | :---: |
+| ![HackerRank Card](examples/hackerrank-card.svg) | ![Duolingo Card](examples/duolingo-card.svg) |
 
 </div>
 
@@ -165,7 +169,7 @@ jobs:
 | Input | Description | Required | Default |
 | :--- | :--- | :---: | :--- |
 | `username` | Target GitHub username | No | `${{ github.repository_owner }}` |
-| `visualizers`| Choice of visualizers: `'all'` or comma-separated list (`'3d-city,activity,habits,languages,leetcode,achievements,velocity,radar,summary'`) | No | `'all'` |
+| `visualizers`| Choice of visualizers: `'all'` or comma-separated list (`'3d-city,activity,habits,languages,leetcode,gfg,hackerrank,duolingo,achievements,velocity,radar,summary'`) | No | `'all'` |
 | `theme` | Built-in palette: `cyberpunk`, `tokyonight`, `dracula`, `nord`, `matrix`, `synthwave`, `monokai`, `sunset`, `github-dark`, `github-light`, `emerald` | No | `'cyberpunk'` |
 | `custom-colors` | 5 comma-separated hex codes for custom palette (`"#161b22,#0e4429,#006d32,#26a641,#39d353"`) | No | `''` |
 | `transparent` | Render transparent backgrounds for seamless dark/light theme integration (`true`/`false`) | No | `'false'` |
@@ -178,6 +182,9 @@ jobs:
 | `hide-legend` | Hide bottom activity legend (`true`/`false`) | No | `'false'` |
 | `year` | Specific calendar year (e.g. `2025`) or `'last-year'` | No | `'last-year'` |
 | `leetcode-username`| LeetCode handle for problem solving telemetry | No | `${{ github.repository_owner }}` |
+| `gfg-username` | GeeksforGeeks handle for problem solving telemetry | No | `${{ github.repository_owner }}` |
+| `hackerrank-username`| HackerRank handle for badges and achievements | No | `${{ github.repository_owner }}` |
+| `duolingo-username`| Duolingo handle for streak and course telemetry | No | `${{ github.repository_owner }}` |
 | `output-dir` | Output folder where SVGs will be saved | No | `'assets'` |
 | `filename` | Output filename for primary 3D city SVG | No | `'profile-3d-city.svg'` |
 
@@ -194,6 +201,9 @@ jobs:
 | `habits-svg-path` | Path to generated Coding Habits SVG |
 | `languages-svg-path` | Path to generated Language Matrix SVG |
 | `leetcode-svg-path` | Path to generated LeetCode Telemetry SVG |
+| `gfg-svg-path` | Path to generated GeeksforGeeks Telemetry SVG |
+| `hackerrank-svg-path`| Path to generated HackerRank Achievements SVG |
+| `duolingo-svg-path` | Path to generated Duolingo Streak SVG |
 | `total-contributions` | Total contribution count detected |
 | `active-days` | Count of active contribution days |
 

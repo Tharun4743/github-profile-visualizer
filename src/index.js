@@ -12,6 +12,9 @@ const { renderAchievements } = require('./visualizers/achievements');
 const { renderCommitVelocity } = require('./visualizers/velocity');
 const { renderSkillsRadar } = require('./visualizers/radar');
 const { renderExecutiveSummary } = require('./visualizers/summary');
+const { renderGFGCard } = require('./visualizers/gfg');
+const { renderHackerRankCard } = require('./visualizers/hackerrank');
+const { renderDuolingoCard } = require('./visualizers/duolingo');
 
 async function run() {
   try {
@@ -34,6 +37,9 @@ async function run() {
     const filename = core.getInput('filename') || 'profile-3d-city.svg';
     const generateAllThemes = core.getInput('generate-all') === 'true';
     const leetcodeUser = core.getInput('leetcode-username') || username;
+    const gfgUser = core.getInput('gfg-username') || core.getInput('gfg_username') || username;
+    const hackerrankUser = core.getInput('hackerrank-username') || core.getInput('hackerrank_username') || username;
+    const duolingoUser = core.getInput('duolingo-username') || core.getInput('duolingo_username') || username;
 
     if (!username) {
       throw new Error('Username is required. Specify input "username" or set GITHUB_REPOSITORY_OWNER.');
@@ -44,7 +50,7 @@ async function run() {
       fs.mkdirSync(resolvedDir, { recursive: true });
     }
 
-    const allVisualizers = ['3d-city', 'activity', 'habits', 'languages', 'leetcode', 'achievements', 'velocity', 'radar', 'summary'];
+    const allVisualizers = ['3d-city', 'activity', 'habits', 'languages', 'leetcode', 'gfg', 'hackerrank', 'duolingo', 'achievements', 'velocity', 'radar', 'summary'];
     const requested = visualizersInput === 'all'
       ? allVisualizers
       : visualizersInput.split(',').map((v) => v.trim());
@@ -136,6 +142,42 @@ async function run() {
       fs.writeFileSync(lcPath, lcSvg, 'utf8');
       core.info(`✅ Generated: ${lcPath}`);
       core.setOutput('leetcode-svg-path', lcPath);
+    }
+
+    // 5b. GeeksforGeeks Card
+    if (requested.includes('gfg') || requested.includes('geeksforgeeks')) {
+      core.info(`Generating GeeksforGeeks Card for @${gfgUser}...`);
+      const gfgSvg = await renderGFGCard(gfgUser, selectedTheme, universalOptions);
+      if (gfgSvg) {
+        const gfgPath = path.join(resolvedDir, 'gfg-card.svg');
+        fs.writeFileSync(gfgPath, gfgSvg, 'utf8');
+        core.info(`✅ Generated: ${gfgPath}`);
+        core.setOutput('gfg-svg-path', gfgPath);
+      }
+    }
+
+    // 5c. HackerRank Card
+    if (requested.includes('hackerrank') || requested.includes('hr')) {
+      core.info(`Generating HackerRank Card for @${hackerrankUser}...`);
+      const hrSvg = await renderHackerRankCard(hackerrankUser, selectedTheme, universalOptions);
+      if (hrSvg) {
+        const hrPath = path.join(resolvedDir, 'hackerrank-card.svg');
+        fs.writeFileSync(hrPath, hrSvg, 'utf8');
+        core.info(`✅ Generated: ${hrPath}`);
+        core.setOutput('hackerrank-svg-path', hrPath);
+      }
+    }
+
+    // 5d. Duolingo Card
+    if (requested.includes('duolingo') || requested.includes('duo')) {
+      core.info(`Generating Duolingo Card for @${duolingoUser}...`);
+      const duoSvg = await renderDuolingoCard(duolingoUser, selectedTheme, universalOptions);
+      if (duoSvg) {
+        const duoPath = path.join(resolvedDir, 'duolingo-card.svg');
+        fs.writeFileSync(duoPath, duoSvg, 'utf8');
+        core.info(`✅ Generated: ${duoPath}`);
+        core.setOutput('duolingo-svg-path', duoPath);
+      }
     }
 
     // 6. Developer Trophies & Achievements

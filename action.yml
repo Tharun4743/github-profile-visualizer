@@ -1,5 +1,5 @@
 name: 'GitHub Profile Visualizer'
-description: 'All-in-one 3D contribution city, coding habits, velocity waves, skills radar, languages matrix, and LeetCode cards'
+description: 'All-in-one developer telemetry: 3D city, coding habits, radar, LeetCode, GFG, HackerRank & Duolingo cards'
 author: 'Tharun4743'
 
 inputs:
@@ -8,7 +8,7 @@ inputs:
     required: false
     default: ${{ github.repository_owner }}
   visualizers:
-    description: 'Visualizers to generate: "all" or comma-separated list ("3d-city,activity,habits,languages,leetcode,achievements,velocity,radar,summary")'
+    description: 'Visualizers to generate: "all" or comma-separated list ("3d-city,activity,habits,languages,leetcode,gfg,hackerrank,duolingo,achievements,velocity,radar,summary")'
     required: false
     default: 'all'
   theme:
@@ -63,6 +63,18 @@ inputs:
     description: 'LeetCode username for problem solving telemetry (defaults to GitHub username)'
     required: false
     default: ''
+  gfg-username:
+    description: 'GeeksforGeeks username for problem solving stats (defaults to GitHub username)'
+    required: false
+    default: ''
+  hackerrank-username:
+    description: 'HackerRank username for badges and achievements (defaults to GitHub username)'
+    required: false
+    default: ''
+  duolingo-username:
+    description: 'Duolingo username for language streak telemetry (defaults to GitHub username)'
+    required: false
+    default: ''
   radar-skills:
     description: 'Custom comma-separated skills and scores for radar (e.g. "Algorithms:0.94,Full Stack:0.96,Distributed:0.88,System Design:0.90,APIs & DBs:0.95")'
     required: false
@@ -95,6 +107,12 @@ outputs:
     description: 'Path to generated Language Matrix SVG'
   leetcode-svg-path:
     description: 'Path to generated LeetCode Telemetry SVG'
+  gfg-svg-path:
+    description: 'Path to generated GeeksforGeeks Telemetry SVG'
+  hackerrank-svg-path:
+    description: 'Path to generated HackerRank Achievements SVG'
+  duolingo-svg-path:
+    description: 'Path to generated Duolingo Streak SVG'
   achievements-svg-path:
     description: 'Path to generated Achievements & Trophies SVG'
   velocity-svg-path:

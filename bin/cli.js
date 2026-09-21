@@ -13,6 +13,9 @@ const { renderAchievements } = require('../src/visualizers/achievements');
 const { renderCommitVelocity } = require('../src/visualizers/velocity');
 const { renderSkillsRadar } = require('../src/visualizers/radar');
 const { renderExecutiveSummary } = require('../src/visualizers/summary');
+const { renderGFGCard } = require('../src/visualizers/gfg');
+const { renderHackerRankCard } = require('../src/visualizers/hackerrank');
+const { renderDuolingoCard } = require('../src/visualizers/duolingo');
 
 function parseArgs() {
   const args = process.argv.slice(2);
@@ -35,6 +38,9 @@ function parseArgs() {
     filename: 'profile-3d-city.svg',
     all: false,
     leetcodeUsername: null,
+    gfgUsername: null,
+    hackerrankUsername: null,
+    duolingoUsername: null,
     skills: null,
   };
 
@@ -70,6 +76,12 @@ function parseArgs() {
       options.year = args[++i];
     } else if (arg === '--leetcode-user' || arg === '--leetcode') {
       options.leetcodeUsername = args[++i];
+    } else if (arg === '--gfg-user' || arg === '--gfg') {
+      options.gfgUsername = args[++i];
+    } else if (arg === '--hackerrank-user' || arg === '--hackerrank' || arg === '--hr') {
+      options.hackerrankUsername = args[++i];
+    } else if (arg === '--duolingo-user' || arg === '--duolingo' || arg === '--duo') {
+      options.duolingoUsername = args[++i];
     } else if (arg === '--skills') {
       options.skills = args[++i];
     } else if (arg === '--output' || arg === '-o') {
@@ -97,7 +109,7 @@ Usage:
 Options:
   -u, --username <name>       Target GitHub username (required)
   -v, --visualizers <types>   Visualizers to generate: 'all' or comma-separated list:
-                              '3d-city,activity,habits,languages,leetcode,achievements,velocity,radar,summary' (default: all)
+                              '3d-city,activity,habits,languages,leetcode,gfg,hackerrank,duolingo,achievements,velocity,radar,summary' (default: all)
   -t, --theme <name>          Theme: cyberpunk, tokyonight, dracula, nord, matrix,
                               synthwave, monokai, sunset, github-dark, github-light (default: cyberpunk)
   -c, --custom-colors <hexes> 5 comma-separated hex codes for levels 0-4
@@ -107,6 +119,9 @@ Options:
   -s, --height-scale <float>  Scale 3D tower elevation (default: 1.0)
   -y, --year <year>           Year (e.g. 2025) or 'last-year'
   --leetcode <username>       LeetCode username (default: same as GitHub)
+  --gfg <username>            GeeksforGeeks username
+  --hackerrank <username>     HackerRank username
+  --duolingo <username>       Duolingo username
   -o, --output <dir>          Output directory (default: ./)
   -f, --filename <name>       Primary 3D SVG filename (default: profile-3d-city.svg)
   -a, --all                   Generate all 10 theme variants of the 3D city
@@ -114,7 +129,7 @@ Options:
 
 Examples:
   npx github-profile-visualizer --username Tharun4743 --visualizers all --output ./assets
-  npx github-profile-visualizer --username Tharun4743 --visualizers "achievements,velocity,radar" --transparent
+  npx github-profile-visualizer --username Tharun4743 --visualizers "leetcode,gfg,hackerrank,duolingo" --transparent
 `);
 }
 
@@ -211,6 +226,42 @@ async function main() {
     const lcPath = path.join(outDir, 'leetcode-card.svg');
     fs.writeFileSync(lcPath, lcSvg, 'utf8');
     console.log(`✨ Generated: ${lcPath}`);
+  }
+
+  // 5b. GeeksforGeeks Card
+  if (requested.includes('gfg') || requested.includes('geeksforgeeks')) {
+    const gfgTarget = options.gfgUsername || options.username;
+    console.log(`🌿 Fetching GeeksforGeeks telemetry for @${gfgTarget}...`);
+    const gfgSvg = await renderGFGCard(gfgTarget, selectedTheme, universalOptions);
+    if (gfgSvg) {
+      const gfgPath = path.join(outDir, 'gfg-card.svg');
+      fs.writeFileSync(gfgPath, gfgSvg, 'utf8');
+      console.log(`✨ Generated: ${gfgPath}`);
+    }
+  }
+
+  // 5c. HackerRank Card
+  if (requested.includes('hackerrank') || requested.includes('hr')) {
+    const hrTarget = options.hackerrankUsername || options.username;
+    console.log(`🎖️ Fetching HackerRank achievements for @${hrTarget}...`);
+    const hrSvg = await renderHackerRankCard(hrTarget, selectedTheme, universalOptions);
+    if (hrSvg) {
+      const hrPath = path.join(outDir, 'hackerrank-card.svg');
+      fs.writeFileSync(hrPath, hrSvg, 'utf8');
+      console.log(`✨ Generated: ${hrPath}`);
+    }
+  }
+
+  // 5d. Duolingo Card
+  if (requested.includes('duolingo') || requested.includes('duo')) {
+    const duoTarget = options.duolingoUsername || options.username;
+    console.log(`🦉 Fetching Duolingo learning streak for @${duoTarget}...`);
+    const duoSvg = await renderDuolingoCard(duoTarget, selectedTheme, universalOptions);
+    if (duoSvg) {
+      const duoPath = path.join(outDir, 'duolingo-card.svg');
+      fs.writeFileSync(duoPath, duoSvg, 'utf8');
+      console.log(`✨ Generated: ${duoPath}`);
+    }
   }
 
   // 6. Developer Trophies & Achievements
