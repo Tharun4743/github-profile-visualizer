@@ -567,7 +567,7 @@ ${langSvg}
   <text style="font-size: 16px;" x="${width - 20}" y="20" dominant-baseline="hanging" text-anchor="end" class="fill-weak">${period}</text>
 
   <!-- Signature Branding -->
-  <text style="font-size: 13px; font-weight: 600; opacity: 0.75; letter-spacing: 0.5px;" x="${width - 20}" y="${height - 20}" text-anchor="end" class="fill-fg">⚡ by @${username}</text>
+  <text style="font-size: 13px; font-weight: 600; opacity: 0.75; letter-spacing: 0.5px;" x="${width - 20}" y="${height - 20}" text-anchor="end" class="fill-fg">&#9889; by @${username}</text>
 </g>
 </svg>`;
 }
