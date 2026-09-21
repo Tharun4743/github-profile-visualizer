@@ -52,6 +52,8 @@ async function run() {
     core.info(`🏙️ Generating Visualizer Suite for @${username}...`);
     core.info(`📋 Requested Visualizers: ${requested.join(', ')}`);
 
+    const radarSkills = core.getInput('radar-skills');
+
     const selectedTheme = THEMES[themeKey] || THEMES.cyberpunk;
     const universalOptions = {
       theme: themeKey,
@@ -60,6 +62,7 @@ async function run() {
       transparent,
       borderRadius,
       showBorder,
+      skills: radarSkills,
     };
 
     let calendarData = null;

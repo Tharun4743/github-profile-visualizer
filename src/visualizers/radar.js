@@ -17,13 +17,32 @@ function renderSkillsRadar(username = '', theme = {}, options = {}) {
   const maxRadius = 58;
 
   // 5 Competency Axes and their score (0.0 to 1.0)
-  const skills = [
+  let skills = [
     { name: 'Algorithms', score: 0.94 },
     { name: 'Full Stack', score: 0.96 },
     { name: 'Distributed', score: 0.88 },
     { name: 'System Design', score: 0.90 },
     { name: 'APIs &amp; DBs', score: 0.95 },
   ];
+
+  if (options.skills) {
+    if (typeof options.skills === 'string') {
+      try {
+        const parsed = options.skills.split(',').map((s) => {
+          const parts = s.split(':');
+          const name = (parts[0] || '').trim().replace(/&amp;/g, '&').replace(/&/g, '&amp;');
+          const score = parseFloat(parts[1]) || 0.85;
+          return { name, score: Math.min(1.0, Math.max(0.1, score)) };
+        }).filter((item) => item.name);
+        if (parsed.length >= 3) skills = parsed;
+      } catch (e) {}
+    } else if (Array.isArray(options.skills) && options.skills.length >= 3) {
+      skills = options.skills.map((s) => ({
+        name: (s.name || '').replace(/&amp;/g, '&').replace(/&/g, '&amp;'),
+        score: Math.min(1.0, Math.max(0.1, parseFloat(s.score) || 0.85)),
+      }));
+    }
+  }
 
   const totalAxes = skills.length;
   const angleStep = (Math.PI * 2) / totalAxes;

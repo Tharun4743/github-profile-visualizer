@@ -63,6 +63,10 @@ inputs:
     description: 'LeetCode username for problem solving telemetry (defaults to GitHub username)'
     required: false
     default: ''
+  radar-skills:
+    description: 'Custom comma-separated skills and scores for radar (e.g. "Algorithms:0.94,Full Stack:0.96,Distributed:0.88,System Design:0.90,APIs & DBs:0.95")'
+    required: false
+    default: ''
   output-dir:
     description: 'Target directory where generated SVG files will be saved'
     required: false

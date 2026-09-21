@@ -35,6 +35,7 @@ function parseArgs() {
     filename: 'profile-3d-city.svg',
     all: false,
     leetcodeUsername: null,
+    skills: null,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -69,6 +70,8 @@ function parseArgs() {
       options.year = args[++i];
     } else if (arg === '--leetcode-user' || arg === '--leetcode') {
       options.leetcodeUsername = args[++i];
+    } else if (arg === '--skills') {
+      options.skills = args[++i];
     } else if (arg === '--output' || arg === '-o') {
       options.output = args[++i];
     } else if (arg === '--filename' || arg === '-f') {
@@ -142,6 +145,7 @@ async function main() {
     transparent: options.transparent,
     borderRadius: options.borderRadius,
     showBorder: options.showBorder,
+    skills: options.skills,
   };
 
   console.log(`⚡ Generating visualizer suite for @${options.username}...`);
