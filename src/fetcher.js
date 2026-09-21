@@ -139,6 +139,8 @@ function fetchFromGraphQL(username, token, year) {
               }
             }
 
+            days.sort((a, b) => new Date(a.date) - new Date(b.date));
+
             // Aggregate languages
             const langMap = {};
             if (collection.commitContributionsByRepository) {
@@ -280,6 +282,8 @@ function fetchFromPublic(username, year) {
           } else {
             total = days.reduce((sum, d) => sum + (d.count || 0), 0);
           }
+
+          days.sort((a, b) => new Date(a.date) - new Date(b.date));
 
           const repoData = await fetchPublicRepos(username);
 

@@ -427,6 +427,9 @@ function render3DCity(telemetry, username, options = {}) {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><text x="50%" y="50%" fill="#fff" text-anchor="middle">No Contribution Data Available</text></svg>`;
   }
 
+  // Ensure days are sorted chronologically
+  days.sort((a, b) => new Date(a.date) - new Date(b.date));
+
   // Projection setup
   const firstDate = new Date(days[0].date);
   const firstUTCDay = firstDate.getUTCDay();
@@ -451,12 +454,12 @@ function render3DCity(telemetry, username, options = {}) {
     const week = Math.floor((toEpochDays(curDate) - sundayOfFirstWeek) / 7);
     const dayOfWeek = curDate.getUTCDay();
 
-    const baseX = offsetX + (week - dayOfWeek) * dx;
+    const baseX = Math.round(offsetX + (week - dayOfWeek) * dx);
     const baseY = offsetY + (week + dayOfWeek) * dy;
     const calHeight = Math.log10((day.count || 0) / 20 + 1) * 144 + 3;
     const contribLevel = Math.min(4, Math.max(0, day.level || 0));
 
-    const heightLeft = calHeight / scaleLeft;
+    const heightLeft = (calHeight / scaleLeft).toFixed(2);
     const heightRight = heightLeft;
 
     let classTop = `cont-top-${contribLevel}`;
@@ -473,33 +476,30 @@ function render3DCity(telemetry, username, options = {}) {
       classTop = `rb-l${contribLevel}-top`;
       classLeft = `rb-l${contribLevel}-left`;
       classRight = `rb-l${contribLevel}-right`;
-      styleTop = ` style="animation-delay: ${delaySeconds}s;"`;
-      styleLeft = ` style="animation-delay: ${delaySeconds}s;"`;
-      styleRight = ` style="animation-delay: ${delaySeconds}s;"`;
+      styleTop = ` style="animation-delay:${delaySeconds}s"`;
+      styleLeft = ` style="animation-delay:${delaySeconds}s"`;
+      styleRight = ` style="animation-delay:${delaySeconds}s"`;
     }
 
-    cubesSvg += `<g transform="translate(${baseX.toFixed(2)} ${(baseY - calHeight).toFixed(2)})">\n`;
-    if (isAnimate && contribLevel !== 0) {
-      cubesSvg += `  <animateTransform attributeName="transform" type="translate" values="${baseX.toFixed(2)} ${(baseY - 3).toFixed(2)};${baseX.toFixed(2)} ${(baseY - calHeight).toFixed(2)}" dur="3s" repeatCount="1"></animateTransform>\n`;
+    if (contribLevel === 0) {
+      cubesSvg += `<g transform="translate(${baseX} ${(baseY - 3).toFixed(2)})"><rect stroke="none" x="0" y="0" width="${dxx}" height="${dxx}" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="${classTop}"${styleTop}></rect><rect stroke="none" x="0" y="0" width="${dxx}" height="2.6" transform="skewY(30) scale(1 1.15)" class="${classLeft}"${styleLeft}></rect><rect stroke="none" x="0" y="0" width="${dxx}" height="2.6" transform="translate(${dxx} ${dyy.toFixed(2)}) skewY(-30) scale(1 1.15)" class="${classRight}"${styleRight}></rect></g>`;
+    } else {
+      cubesSvg += `<g transform="translate(${baseX} ${(baseY - calHeight).toFixed(2)})">`;
+      if (isAnimate) {
+        cubesSvg += `<animateTransform attributeName="transform" type="translate" values="${baseX} ${(baseY - 3).toFixed(2)};${baseX} ${(baseY - calHeight).toFixed(2)}" dur="3s" repeatCount="1"></animateTransform>`;
+      }
+      cubesSvg += `<rect stroke="none" x="0" y="0" width="${dxx}" height="${dxx}" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="${classTop}"${styleTop}></rect>`;
+      cubesSvg += `<rect stroke="none" x="0" y="0" width="${dxx}" height="${heightLeft}" transform="skewY(30) scale(1 1.15)" class="${classLeft}"${styleLeft}>`;
+      if (isAnimate) {
+        cubesSvg += `<animate attributeName="height" values="2.6;${heightLeft}" dur="3s" repeatCount="1"></animate>`;
+      }
+      cubesSvg += `</rect>`;
+      cubesSvg += `<rect stroke="none" x="0" y="0" width="${dxx}" height="${heightRight}" transform="translate(${dxx} ${dyy.toFixed(2)}) skewY(-30) scale(1 1.15)" class="${classRight}"${styleRight}>`;
+      if (isAnimate) {
+        cubesSvg += `<animate attributeName="height" values="2.6;${heightRight}" dur="3s" repeatCount="1"></animate>`;
+      }
+      cubesSvg += `</rect></g>`;
     }
-
-    // Top face
-    cubesSvg += `  <rect stroke="none" x="0" y="0" width="${dxx}" height="${dxx}" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="${classTop}"${styleTop}></rect>\n`;
-
-    // Left face
-    cubesSvg += `  <rect stroke="none" x="0" y="0" width="${dxx}" height="${heightLeft.toFixed(2)}" transform="skewY(30) scale(1 1.15)" class="${classLeft}"${styleLeft}>\n`;
-    if (isAnimate && contribLevel !== 0) {
-      cubesSvg += `    <animate attributeName="height" values="${(3 / scaleLeft).toFixed(2)};${heightLeft.toFixed(2)}" dur="3s" repeatCount="1"></animate>\n`;
-    }
-    cubesSvg += `  </rect>\n`;
-
-    // Right face
-    cubesSvg += `  <rect stroke="none" x="0" y="0" width="${dxx}" height="${heightRight.toFixed(2)}" transform="translate(${dxx} ${dyy.toFixed(2)}) skewY(-30) scale(1 1.15)" class="${classRight}"${styleRight}>\n`;
-    if (isAnimate && contribLevel !== 0) {
-      cubesSvg += `    <animate attributeName="height" values="${(3 / scaleRight).toFixed(2)};${heightRight.toFixed(2)}" dur="3s" repeatCount="1"></animate>\n`;
-    }
-    cubesSvg += `  </rect>\n`;
-    cubesSvg += `</g>\n`;
   });
 
   // Radar Chart dimensions
