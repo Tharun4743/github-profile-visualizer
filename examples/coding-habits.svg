@@ -1,0 +1,48 @@
+<svg width="467" height="195" viewBox="0 0 467 195" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0.5" y="0.5" width="466" height="194" rx="8" fill="#090d16" stroke="#243048" stroke-width="1.5" />
+  
+  <!-- Header -->
+  <g transform="translate(24, 30)">
+    <text fill="#00f0ff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">
+      🕒 Productive Coding Habits • @Tharun4743
+    </text>
+  </g>
+
+  
+      <g transform="translate(24, 52)">
+        <text x="0" y="12" font-size="12">🌅</text>
+        <text x="22" y="12" fill="#c0caf5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="500">Morning (06-12)</text>
+        <rect x="130" y="2" width="200" height="12" rx="6" fill="#131620" />
+        <rect x="130" y="2" width="4" height="12" rx="6" fill="#00d26a" />
+        <text x="345" y="12" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600">1%</text>
+      </g>
+  
+      <g transform="translate(24, 80)">
+        <text x="0" y="12" font-size="12">☀️</text>
+        <text x="22" y="12" fill="#c0caf5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="500">Daytime (12-18)</text>
+        <rect x="130" y="2" width="200" height="12" rx="6" fill="#131620" />
+        <rect x="130" y="2" width="198" height="12" rx="6" fill="#00f0ff" />
+        <text x="345" y="12" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600">99%</text>
+      </g>
+  
+      <g transform="translate(24, 108)">
+        <text x="0" y="12" font-size="12">🌆</text>
+        <text x="22" y="12" fill="#c0caf5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="500">Evening (18-24)</text>
+        <rect x="130" y="2" width="200" height="12" rx="6" fill="#131620" />
+        <rect x="130" y="2" width="4" height="12" rx="6" fill="#bd93f9" />
+        <text x="345" y="12" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600">0%</text>
+      </g>
+  
+      <g transform="translate(24, 136)">
+        <text x="0" y="12" font-size="12">🌙</text>
+        <text x="22" y="12" fill="#c0caf5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="500">Night Owl (00-06)</text>
+        <rect x="130" y="2" width="200" height="12" rx="6" fill="#131620" />
+        <rect x="130" y="2" width="4" height="12" rx="6" fill="#ff79c6" />
+        <text x="345" y="12" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600">0%</text>
+      </g>
+
+  <!-- Footer Tip -->
+  <text x="443" y="179" text-anchor="end" fill="#565f89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="10">
+    Computed from recent activity telemetry
+  </text>
+</svg>

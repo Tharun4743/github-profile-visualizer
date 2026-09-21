@@ -1,10 +1,10 @@
 <div align="center">
 
-# ⚡ GitHub Profile 3D City
+# ⚡ GitHub Profile 3D City & Activity Suite
 
-### Turn your GitHub contribution calendar into an animated 3D isometric cyber city skyline.
+### All-in-one developer activity visualizer: 3D isometric city skylines, coding habits radar, recent activity stream, language matrix, and LeetCode cards.
 
-[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-GitHub%20Profile%203D%20City-purple?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/marketplace/actions/github-profile-3d-city)
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-GitHub%20Profile%203D%20City-purple?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/marketplace/actions/github-profile-3d-city-activity-suite)
 [![GitHub release](https://img.shields.io/github/v/release/Tharun4743/github-profile-3d-city?color=7aa2f7&style=for-the-badge)](https://github.com/Tharun4743/github-profile-3d-city/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-00f0ff?style=for-the-badge)](LICENSE)
 [![Node 20](https://img.shields.io/badge/Runtime-Node.js%2020-00d26a?style=for-the-badge&logo=nodedotjs&logoColor=white)](package.json)
@@ -12,26 +12,28 @@
 
 <br/>
 
-<!-- Cyberpunk Theme Showcase -->
-<img src="examples/profile-3d-cyberpunk.svg" alt="GitHub Profile 3D City - Cyberpunk Edition" width="100%" />
+<!-- Flagship 3D City Preview -->
+<img src="examples/profile-3d-cyberpunk.svg" alt="3D Isometric Contribution City" width="100%" />
 
 </div>
 
 ---
 
-## 🌟 Features
+## 🌟 The Visualizer Suite
 
-- 🏙️ **Isometric 3D Vector Math**: Generates crisp, lightweight vector SVGs with zero Chromium, Puppeteer, or canvas dependencies.
-- 🎨 **10+ Curated Developer Themes**: Including Cyberpunk, Tokyo Night, Dracula, Nord, Matrix, Synthwave, Monokai, and GitHub Dark.
-- 🌈 **Custom Color Palettes**: Provide any 5 hex codes (`#161b22,#0e4429,...`) to match your exact brand or portfolio.
-- ✨ **Neon Lighting Animations**: CSS-powered ambient pulse and hover glow on skyscraper rooftops.
-- 📐 **Elevation Controls**: Adjust tower heights with the `height-scale` multiplier.
-- 📅 **Multi-Year Support**: Render telemetry for specific calendar years (`2025`, `2024`) or the rolling last 365 days.
-- ⚡ **Dual Execution**: Run automatically via **GitHub Actions** or generate on-demand via the **CLI**.
+Instead of installing 4 or 5 separate actions, this suite generates **all your telemetry cards in a single run**:
+
+| 🕒 Productive Coding Habits | ⚡ Live Activity Stream |
+| :---: | :---: |
+| ![Coding Habits](examples/coding-habits.svg) | ![Recent Activity](examples/activity-timeline.svg) |
+
+| 💻 Language Distribution Matrix | 🧩 LeetCode Problem Solving Card |
+| :---: | :---: |
+| ![Languages Matrix](examples/languages-matrix.svg) | ![LeetCode Card](examples/leetcode-card.svg) |
 
 ---
 
-## 🎨 Themes Showcase
+## 🎨 3D City Themes Gallery
 
 <div align="center">
 
@@ -47,13 +49,9 @@
 | :---: | :---: |
 | ![Matrix](examples/profile-3d-matrix.svg) | ![Synthwave](examples/profile-3d-synthwave.svg) |
 
-| Monokai Pro | Neon Sunset |
+| Monokai Pro | Custom Hex Palette |
 | :---: | :---: |
-| ![Monokai](examples/profile-3d-monokai.svg) | ![Sunset](examples/profile-3d-sunset.svg) |
-
-| GitHub Dark | Custom Hex Palette |
-| :---: | :---: |
-| ![GitHub Dark](examples/profile-3d-github-dark.svg) | ![Custom Palette](examples/profile-3d-custom.svg) |
+| ![Monokai](examples/profile-3d-monokai.svg) | ![Custom](examples/profile-3d-custom.svg) |
 
 </div>
 
@@ -61,10 +59,10 @@
 
 ## 🚀 Quickstart: GitHub Actions
 
-Add this workflow to your profile repository (`username/username`) at `.github/workflows/profile-3d-city.yml`:
+Add this workflow to your profile repository (`username/username`) at `.github/workflows/profile-visualizers.yml`:
 
 ```yaml
-name: Update 3D Contribution City
+name: Update Profile Visualizers
 
 on:
   schedule:
@@ -79,63 +77,81 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: generate-3d-city
+    name: generate-visualizers
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate 3D City
+      - name: Generate Visualizer Suite
         uses: Tharun4743/github-profile-3d-city@v1
         with:
           username: ${{ github.repository_owner }}
+          visualizers: 'all' # Generates 3D city, activity, habits, languages & leetcode
           theme: 'cyberpunk'
-          output-dir: 'profile-3d-contrib'
+          leetcode-username: 'Tharunkumar__K'
+          output-dir: 'assets'
 
       - name: Commit & Push Changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add profile-3d-contrib/
+          git add assets/
           if git diff --cached --quiet; then
-            echo "No 3D city changes to commit."
+            echo "No visualizer changes to commit."
           else
-            git commit -m "chore: update 3D contribution city [skip ci]"
+            git commit -m "chore: update profile visualizers [skip ci]"
             git pull --rebase origin main
             git push
           fi
 ```
 
-Then display the SVG in your profile `README.md`:
+### Embed in Your Profile README
 
-```markdown
-<img src="profile-3d-contrib/profile-3d-city.svg" alt="3D Contribution City" width="100%" />
+```html
+<!-- 3D Contribution City -->
+<img src="assets/profile-3d-city.svg" width="100%" alt="3D Contribution City" />
+
+<!-- Side-by-Side Activity & Habits -->
+<table border="0" width="100%">
+  <tr>
+    <td width="50%"><img src="assets/coding-habits.svg" width="100%" /></td>
+    <td width="50%"><img src="assets/activity-timeline.svg" width="100%" /></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="assets/languages-matrix.svg" width="100%" /></td>
+    <td width="50%"><img src="assets/leetcode-card.svg" width="100%" /></td>
+  </tr>
+</table>
 ```
 
 ---
 
-## ⚙️ Configuration Options
+## ⚙️ Configuration Inputs
 
 | Input | Description | Required | Default |
 | :--- | :--- | :---: | :--- |
 | `username` | Target GitHub username | No | `${{ github.repository_owner }}` |
-| `theme` | Built-in theme: `cyberpunk`, `tokyonight`, `dracula`, `nord`, `matrix`, `synthwave`, `monokai`, `sunset`, `github-dark`, `github-light` | No | `'cyberpunk'` |
-| `custom-colors` | 5 comma-separated hex colors for levels 0–4 (e.g. `"#161b22,#0e4429,#006d32,#26a641,#39d353"`) | No | `''` |
-| `custom-bg` | Custom canvas background hex color | No | `''` |
-| `title` | Custom header title | No | `⚡ {username}'s 3D Contribution City` |
-| `hide-header` | Hide header title and telemetry statistics (`true`/`false`) | No | `'false'` |
+| `visualizers`| Choice of visualizers: `'all'` or comma-separated (`'3d-city,activity,habits,languages,leetcode'`) | No | `'3d-city'` |
+| `theme` | Built-in palette: `cyberpunk`, `tokyonight`, `dracula`, `nord`, `matrix`, `synthwave`, `monokai`, `sunset`, `github-dark`, `github-light` | No | `'cyberpunk'` |
+| `custom-colors` | 5 comma-separated hex codes for custom palette (`"#161b22,#0e4429,#006d32,#26a641,#39d353"`) | No | `''` |
+| `title` | Custom header title for the 3D City | No | `⚡ {username}'s 3D Contribution City` |
+| `height-scale`| Multiplier for 3D tower elevation (`1.0`, `1.5`, `2.0`) | No | `'1.0'` |
+| `animate` | Enable neon lighting reflection animation (`true`/`false`) | No | `'true'` |
+| `hide-header` | Hide header title and telemetry counters (`true`/`false`) | No | `'false'` |
 | `hide-legend` | Hide bottom activity legend (`true`/`false`) | No | `'false'` |
-| `animate` | Enable pulsing neon lighting reflection animation (`true`/`false`) | No | `'true'` |
-| `height-scale`| Multiplier for tower elevation (`1.0`, `1.5`, `2.0`) | No | `'1.0'` |
 | `year` | Specific calendar year (e.g. `2025`) or `'last-year'` | No | `'last-year'` |
-| `output-dir` | Target directory where the SVG will be saved | No | `'profile-3d-contrib'` |
-| `filename` | Output SVG filename | No | `'profile-3d-city.svg'` |
-| `generate-all`| Generate all theme variants simultaneously (`true`/`false`) | No | `'false'` |
-| `token` | GitHub access token (e.g. `${{ secrets.GITHUB_TOKEN }}`) | No | `${{ github.token }}` |
+| `leetcode-username`| LeetCode handle for problem solving telemetry | No | `${{ github.repository_owner }}` |
+| `output-dir` | Output folder where SVGs will be saved | No | `'profile-3d-contrib'` |
+| `filename` | Output filename for primary 3D city SVG | No | `'profile-3d-city.svg'` |
 
 ### Action Outputs
 
 | Output | Description |
 | :--- | :--- |
-| `svg-path` | Absolute file path to the generated SVG |
+| `svg-path` | Path to generated 3D City SVG |
+| `activity-svg-path` | Path to generated Recent Activity SVG |
+| `habits-svg-path` | Path to generated Coding Habits SVG |
+| `languages-svg-path` | Path to generated Language Matrix SVG |
+| `leetcode-svg-path` | Path to generated LeetCode Telemetry SVG |
 | `total-contributions` | Total contribution count detected |
 | `active-days` | Count of active contribution days |
 
@@ -143,69 +159,26 @@ Then display the SVG in your profile `README.md`:
 
 ## 💻 CLI Usage
 
-Run without installing via `npx`:
-
 ```bash
-# Default Cyberpunk theme
-npx github-profile-3d-city --username Tharun4743
+# Generate the full visualizer suite
+npx github-profile-3d-city --username Tharun4743 --visualizers all --output ./assets
 
-# Specific theme with elevation multiplier
-npx github-profile-3d-city --username Tharun4743 --theme dracula --height-scale 1.5
+# Generate only 3D City and Coding Habits in Dracula theme
+npx github-profile-3d-city --username Tharun4743 --visualizers "3d-city,habits" --theme dracula
 
-# User-defined custom color palette
-npx github-profile-3d-city --username Tharun4743 --custom-colors "#151515,#00d26a,#00f0ff,#bd93f9,#ff79c6" --title "My Cyber City"
-
-# Generate all 10 themes at once into custom directory
-npx github-profile-3d-city --username Tharun4743 --all --output ./3d-cities
-```
-
-### CLI Flags
-
-| Flag | Short | Description | Default |
-| :--- | :---: | :--- | :--- |
-| `--username` | `-u` | GitHub username *(required)* | — |
-| `--theme` | `-t` | Built-in theme name | `cyberpunk` |
-| `--custom-colors` | `-c` | 5 comma-separated hex codes for levels 0–4 | — |
-| `--height-scale` | `-s` | Scale tower heights | `1.0` |
-| `--year` | `-y` | Year or `last-year` | `last-year` |
-| `--title` | — | Custom header text | — |
-| `--hide-header` | — | Hide header | `false` |
-| `--hide-legend` | — | Hide legend | `false` |
-| `--no-animate` | — | Disable animations | `false` |
-| `--all` | `-a` | Generate all themes | `false` |
-| `--output` | `-o` | Destination folder | `./` |
-| `--filename` | `-f` | Output SVG filename | `profile-3d-city.svg` |
-
----
-
-## 📦 Programmatic Usage (Node.js)
-
-```javascript
-const { fetchContributions } = require('github-profile-3d-city/src/fetcher');
-const { render3DCity } = require('github-profile-3d-city/src/isometric');
-
-async function createCity() {
-  const data = await fetchContributions('Tharun4743');
-  const svg = render3DCity(data, 'Tharun4743', {
-    theme: 'dracula',
-    heightScale: 1.2,
-    animate: true,
-  });
-  console.log(svg);
-}
-
-createCity();
+# Generate with custom hex palette
+npx github-profile-3d-city --username Tharun4743 --custom-colors "#151515,#00d26a,#00f0ff,#bd93f9,#ff79c6"
 ```
 
 ---
 
 ## 🚀 How to Publish to GitHub Marketplace
 
-1. Open your repository: **[https://github.com/Tharun4743/github-profile-3d-city](https://github.com/Tharun4743/github-profile-3d-city)**.
-2. In the right-hand sidebar under **Releases**, click **"Draft a new release"** (or click the blue banner **"Publish this Action to the GitHub Marketplace"**).
-3. Check the checkbox: **"Publish this Action to the GitHub Marketplace"**.
-4. Select category: **Utilities** (and **Publishing**).
-5. Ensure the tag is set to `v1.1.0` and click **Publish release**!
+1. Navigate to: **[https://github.com/Tharun4743/github-profile-3d-city](https://github.com/Tharun4743/github-profile-3d-city)**.
+2. In the right-hand sidebar under **Releases**, click on **Releases** or edit the latest release **v1.2.0**.
+3. Check the box: **☑ "Publish this Action to the GitHub Marketplace"**.
+4. Select category: **Utilities** (and **Continuous Integration**).
+5. Click **Publish release**!
 
 ---
 

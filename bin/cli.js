@@ -5,12 +5,17 @@ const path = require('path');
 const { fetchContributions } = require('../src/fetcher');
 const { render3DCity } = require('../src/isometric');
 const { THEMES } = require('../src/themes');
+const { renderActivityTimeline } = require('../src/visualizers/activity');
+const { renderCodingHabits } = require('../src/visualizers/habits');
+const { renderLanguageMatrix } = require('../src/visualizers/languages');
+const { renderLeetCodeCard } = require('../src/visualizers/leetcode');
 
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
     username: null,
     theme: 'cyberpunk',
+    visualizers: '3d-city',
     customColors: null,
     customBg: null,
     title: null,
@@ -22,6 +27,7 @@ function parseArgs() {
     output: './',
     filename: 'profile-3d-city.svg',
     all: false,
+    leetcodeUsername: null,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -30,6 +36,8 @@ function parseArgs() {
       options.username = args[++i];
     } else if (arg === '--theme' || arg === '-t') {
       options.theme = args[++i];
+    } else if (arg === '--visualizers' || arg === '-v') {
+      options.visualizers = args[++i];
     } else if (arg === '--custom-colors' || arg === '-c') {
       options.customColors = args[++i];
     } else if (arg === '--custom-bg') {
@@ -46,6 +54,8 @@ function parseArgs() {
       options.heightScale = parseFloat(args[++i]);
     } else if (arg === '--year' || arg === '-y') {
       options.year = args[++i];
+    } else if (arg === '--leetcode-user' || arg === '--leetcode') {
+      options.leetcodeUsername = args[++i];
     } else if (arg === '--output' || arg === '-o') {
       options.output = args[++i];
     } else if (arg === '--filename' || arg === '-f') {
@@ -63,33 +73,33 @@ function parseArgs() {
 
 function printHelp() {
   console.log(`
-⚡ github-profile-3d-city — Ultra-Customizable CLI Tool
-Transform your GitHub contribution calendar into an isometric 3D cyber city skyline.
+⚡ github-profile-3d-city — All-in-One Developer Activity Visualizer Suite
 
 Usage:
   github-profile-3d-city --username <user> [options]
 
 Options:
   -u, --username <name>       Target GitHub username (required)
+  -v, --visualizers <types>   Visualizers to generate: 'all' or comma-separated list:
+                              '3d-city,activity,habits,languages,leetcode' (default: 3d-city)
   -t, --theme <name>          Theme: cyberpunk, tokyonight, dracula, nord, matrix,
                               synthwave, monokai, sunset, github-dark, github-light (default: cyberpunk)
-  -c, --custom-colors <hexes> 5 comma-separated hex colors for levels 0-4 (e.g. "#161b22,#0e4429,...")
-  --custom-bg <hex>           Custom background color (e.g. "#0a0a0f")
+  -c, --custom-colors <hexes> 5 comma-separated hex codes for levels 0-4
   --title <string>            Custom header title
-  --hide-header               Hide header text and telemetry counters
-  --hide-legend               Hide bottom activity legend
-  --no-animate                Disable pulsing neon light animation
-  -s, --height-scale <float>  Scale tower heights (e.g. 1.5, default: 1.0)
-  -y, --year <year>           Calendar year (e.g. 2025) or 'last-year' (default: last-year)
-  -o, --output <dir>          Output directory (default: current directory)
-  -f, --filename <name>       Output SVG filename (default: profile-3d-city.svg)
-  -a, --all                   Generate SVGs for all available themes
-  -h, --help                  Show this help screen
+  --hide-header               Hide header and telemetry
+  --hide-legend               Hide bottom legend
+  --no-animate                Disable light animations
+  -s, --height-scale <float>  Scale 3D tower elevation (default: 1.0)
+  -y, --year <year>           Year (e.g. 2025) or 'last-year'
+  --leetcode <username>       LeetCode username (default: same as GitHub)
+  -o, --output <dir>          Output directory (default: ./)
+  -f, --filename <name>       Primary 3D SVG filename (default: profile-3d-city.svg)
+  -a, --all                   Generate all 10 theme variants of the 3D city
+  -h, --help                  Show help screen
 
 Examples:
-  npx github-profile-3d-city --username Tharun4743 --theme dracula
-  npx github-profile-3d-city --username Tharun4743 --custom-colors "#151515,#00d26a,#00f0ff,#bd93f9,#ff79c6"
-  npx github-profile-3d-city --username Tharun4743 --height-scale 1.4 --title "Code City" -o ./assets
+  npx github-profile-3d-city --username Tharun4743 --visualizers all --output ./assets
+  npx github-profile-3d-city --username Tharun4743 --visualizers "3d-city,habits" --theme dracula
 `);
 }
 
@@ -97,7 +107,7 @@ async function main() {
   const options = parseArgs();
 
   if (!options.username) {
-    console.error('Error: --username is required.\nRun with --help for usage details.');
+    console.error('Error: --username is required.\nRun with --help for details.');
     process.exit(1);
   }
 
@@ -106,26 +116,75 @@ async function main() {
     fs.mkdirSync(outDir, { recursive: true });
   }
 
-  console.log(`🏙️  Fetching contribution history for @${options.username} (Year: ${options.year})...`);
   const token = process.env.GITHUB_TOKEN;
-  const data = await fetchContributions(options.username, token, options.year);
-  console.log(`📊 Fetched ${data.days.length} days of telemetry (Total: ${data.total} contributions).`);
+  const requested = options.visualizers.toLowerCase() === 'all'
+    ? ['3d-city', 'activity', 'habits', 'languages', 'leetcode']
+    : options.visualizers.toLowerCase().split(',').map((v) => v.trim());
 
-  if (options.all) {
-    for (const tKey of Object.keys(THEMES)) {
-      const svg = render3DCity(data, options.username, { ...options, theme: tKey, customColors: null });
-      const filePath = path.join(outDir, `profile-3d-${tKey}.svg`);
+  const selectedTheme = THEMES[options.theme] || THEMES.cyberpunk;
+
+  console.log(`⚡ Generating visualizer suite for @${options.username}...`);
+  console.log(`📋 Active visualizers: ${requested.join(', ')}`);
+
+  // 1. 3D City
+  if (requested.includes('3d-city') || requested.includes('city')) {
+    console.log(`🏙️  Fetching contribution history (${options.year})...`);
+    const data = await fetchContributions(options.username, token, options.year);
+    console.log(`📊 Fetched ${data.days.length} days of telemetry (Total: ${data.total}).`);
+
+    if (options.all) {
+      for (const tKey of Object.keys(THEMES)) {
+        const svg = render3DCity(data, options.username, { ...options, theme: tKey });
+        const filePath = path.join(outDir, `profile-3d-${tKey}.svg`);
+        fs.writeFileSync(filePath, svg, 'utf8');
+        console.log(`✨ Generated: ${filePath}`);
+      }
+    } else {
+      const svg = render3DCity(data, options.username, options);
+      const filePath = path.join(outDir, options.filename);
       fs.writeFileSync(filePath, svg, 'utf8');
       console.log(`✨ Generated: ${filePath}`);
     }
-  } else {
-    const svg = render3DCity(data, options.username, options);
-    const filePath = path.join(outDir, options.filename);
-    fs.writeFileSync(filePath, svg, 'utf8');
-    console.log(`✨ Generated: ${filePath}`);
   }
 
-  console.log('🎉 Done!');
+  // 2. Activity Timeline
+  if (requested.includes('activity') || requested.includes('activity-timeline')) {
+    console.log('⚡ Fetching recent public events...');
+    const actSvg = await renderActivityTimeline(options.username, token, selectedTheme);
+    const actPath = path.join(outDir, 'activity-timeline.svg');
+    fs.writeFileSync(actPath, actSvg, 'utf8');
+    console.log(`✨ Generated: ${actPath}`);
+  }
+
+  // 3. Coding Habits
+  if (requested.includes('habits') || requested.includes('coding-habits')) {
+    console.log('🕒 Computing productive coding habits...');
+    const habitsSvg = await renderCodingHabits(options.username, token, selectedTheme);
+    const habitsPath = path.join(outDir, 'coding-habits.svg');
+    fs.writeFileSync(habitsPath, habitsSvg, 'utf8');
+    console.log(`✨ Generated: ${habitsPath}`);
+  }
+
+  // 4. Languages Matrix
+  if (requested.includes('languages') || requested.includes('langs')) {
+    console.log('💻 Computing language byte ratios...');
+    const langSvg = await renderLanguageMatrix(options.username, token, selectedTheme);
+    const langPath = path.join(outDir, 'languages-matrix.svg');
+    fs.writeFileSync(langPath, langSvg, 'utf8');
+    console.log(`✨ Generated: ${langPath}`);
+  }
+
+  // 5. LeetCode Card
+  if (requested.includes('leetcode')) {
+    const lcUser = options.leetcodeUsername || options.username;
+    console.log(`🧩 Fetching LeetCode problem solving telemetry for @${lcUser}...`);
+    const lcSvg = await renderLeetCodeCard(lcUser, selectedTheme);
+    const lcPath = path.join(outDir, 'leetcode-card.svg');
+    fs.writeFileSync(lcPath, lcSvg, 'utf8');
+    console.log(`✨ Generated: ${lcPath}`);
+  }
+
+  console.log('🎉 Done! All requested visualizers generated successfully.');
 }
 
 main().catch((err) => {

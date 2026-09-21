@@ -1,16 +1,16 @@
-name: 'GitHub Profile 3D City'
-description: 'Generate customizable, animated 3D isometric contribution city skylines for your GitHub profile README'
+name: 'GitHub Profile 3D City & Activity Suite'
+description: 'All-in-one developer activity visualizer: animated 3D isometric city skylines, coding habits, recent activity stream, languages matrix, and LeetCode cards'
 author: 'Tharun4743'
 
 inputs:
   username:
-    description: 'GitHub username to generate the 3D contribution city for'
+    description: 'Target GitHub username'
     required: false
     default: ${{ github.repository_owner }}
-  token:
-    description: 'GitHub token (e.g. secrets.GITHUB_TOKEN) for GraphQL API telemetry'
+  visualizers:
+    description: 'Visualizers to generate: "all" or comma-separated list ("3d-city,activity,habits,languages,leetcode")'
     required: false
-    default: ${{ github.token }}
+    default: '3d-city'
   theme:
     description: 'Color theme: cyberpunk, tokyonight, dracula, nord, matrix, synthwave, monokai, sunset, github-dark, github-light'
     required: false
@@ -20,15 +20,15 @@ inputs:
     required: false
     default: ''
   custom-bg:
-    description: 'Optional hex background color for custom color theme'
+    description: 'Optional canvas background hex color'
     required: false
     default: ''
   title:
-    description: 'Custom header title text'
+    description: 'Custom header title for the 3D city'
     required: false
     default: ''
   hide-header:
-    description: 'Whether to hide the top header title and telemetry counters (true/false)'
+    description: 'Whether to hide the top header and telemetry counters in the 3D city (true/false)'
     required: false
     default: 'false'
   hide-legend:
@@ -47,22 +47,38 @@ inputs:
     description: 'Year to fetch contributions for (e.g. 2025) or "last-year"'
     required: false
     default: 'last-year'
+  leetcode-username:
+    description: 'LeetCode username for problem solving telemetry (defaults to GitHub username)'
+    required: false
+    default: ''
   output-dir:
-    description: 'Target directory where the generated SVG file will be saved'
+    description: 'Target directory where generated SVG files will be saved'
     required: false
     default: 'profile-3d-contrib'
   filename:
-    description: 'Filename for the generated SVG'
+    description: 'Filename for primary 3D city SVG'
     required: false
     default: 'profile-3d-city.svg'
   generate-all:
-    description: 'Whether to generate all themes into the output directory (true/false)'
+    description: 'Whether to generate all 10 theme variants of the 3D city (true/false)'
     required: false
     default: 'false'
+  token:
+    description: 'GitHub token (e.g. secrets.GITHUB_TOKEN) for API queries'
+    required: false
+    default: ${{ github.token }}
 
 outputs:
   svg-path:
-    description: 'Absolute path to the generated SVG file'
+    description: 'Path to generated 3D City SVG'
+  activity-svg-path:
+    description: 'Path to generated Recent Activity Timeline SVG'
+  habits-svg-path:
+    description: 'Path to generated Coding Habits SVG'
+  languages-svg-path:
+    description: 'Path to generated Language Matrix SVG'
+  leetcode-svg-path:
+    description: 'Path to generated LeetCode Telemetry SVG'
   total-contributions:
     description: 'Total number of contributions found'
   active-days:
