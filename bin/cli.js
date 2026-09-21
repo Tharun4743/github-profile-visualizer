@@ -147,14 +147,21 @@ async function main() {
   }
 
   const token = process.env.GITHUB_TOKEN;
-  const allVisualizers = ['3d-city', 'activity', 'habits', 'languages', 'leetcode', 'achievements', 'velocity', 'radar', 'summary'];
+  const allVisualizers = ['3d-city', 'activity', 'habits', 'languages', 'leetcode', 'gfg', 'hackerrank', 'duolingo', 'achievements', 'velocity', 'radar', 'summary'];
   const requested = options.visualizers.toLowerCase() === 'all'
     ? allVisualizers
     : options.visualizers.toLowerCase().split(',').map((v) => v.trim());
 
-  const selectedTheme = THEMES[options.theme] || THEMES.cyberpunk;
+  const themeKeys = Object.keys(THEMES);
+  let activeThemeKey = (options.theme || 'cyberpunk').toLowerCase();
+  if (activeThemeKey === 'random' || activeThemeKey === 'auto' || activeThemeKey === 'rotate') {
+    activeThemeKey = themeKeys[Math.floor(Math.random() * themeKeys.length)];
+    console.log(`🎲 Dynamic Theme Engine: Selected "${activeThemeKey}" theme.`);
+  }
+
+  const selectedTheme = THEMES[activeThemeKey] || THEMES.cyberpunk;
   const universalOptions = {
-    theme: options.theme,
+    theme: activeThemeKey,
     customColors: options.customColors,
     customBg: options.customBg,
     transparent: options.transparent,

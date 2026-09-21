@@ -58,11 +58,16 @@ async function run() {
     core.info(`🏙️ Generating Visualizer Suite for @${username}...`);
     core.info(`📋 Requested Visualizers: ${requested.join(', ')}`);
 
-    const radarSkills = core.getInput('radar-skills');
+    const themeKeys = Object.keys(THEMES);
+    let activeThemeKey = themeKey;
+    if (themeKey === 'random' || themeKey === 'auto' || themeKey === 'rotate') {
+      activeThemeKey = themeKeys[Math.floor(Math.random() * themeKeys.length)];
+      core.info(`🎲 Dynamic Theme Engine: Selected "${activeThemeKey}" theme for this run.`);
+    }
 
-    const selectedTheme = THEMES[themeKey] || THEMES.cyberpunk;
+    const selectedTheme = THEMES[activeThemeKey] || THEMES.cyberpunk;
     const universalOptions = {
-      theme: themeKey,
+      theme: activeThemeKey,
       customColors,
       customBg,
       transparent,

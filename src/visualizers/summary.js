@@ -33,7 +33,14 @@ function renderExecutiveSummary(username = '', ghData = {}, lcData = {}, theme =
     </g>`;
 
   return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="${rx}" fill="${bg}" stroke="${border}" stroke-width="1.5" />
+  <style>
+    @keyframes bannerPulse {
+      0%, 100% { stroke: ${titleColor}; }
+      50% { stroke: #bd93f9; }
+    }
+    .banner-border { animation: bannerPulse 8s ease-in-out infinite; }
+  </style>
+  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="${rx}" fill="${bg}" stroke="${border}" stroke-width="1.5" class="banner-border" />
 
   <!-- Header Banner Title -->
   <g transform="translate(28, 28)">

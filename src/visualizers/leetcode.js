@@ -80,8 +80,13 @@ async function renderLeetCodeCard(username, theme = {}, options = {}) {
   <style>
     .stat-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; font-weight: 600; fill: #c0caf5; }
     .stat-val { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; font-weight: 700; }
+    @keyframes liveThemePulse {
+      0%, 100% { stroke: #ffa116; }
+      50% { stroke: #00f0ff; }
+    }
+    .card-border { animation: liveThemePulse 7s ease-in-out infinite; }
   </style>
-  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="${rx}" fill="${bg}" stroke="${border}" stroke-width="1.5" />
+  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="${rx}" fill="${bg}" stroke="${border}" stroke-width="1.5" class="card-border" />
 
   <!-- Header -->
   <g transform="translate(24, 32)">
