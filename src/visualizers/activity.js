@@ -119,8 +119,20 @@ function formatEvent(e) {
 }
 
 async function renderActivityTimeline(username, token, theme = {}, options = {}) {
-  const eventsRaw = await fetchJson(`https://api.github.com/users/${username}/events/public?per_page=15`, token);
-  const events = Array.isArray(eventsRaw) ? eventsRaw.slice(0, 5).map(formatEvent) : [];
+  const eventsRaw = await fetchJson(`https://api.github.com/users/${username}/events/public?per_page=100`, token);
+  
+  const targetUser = (username || '').toLowerCase();
+
+  // Only include activity on the user's own repositories (no external other repos)
+  const filteredEvents = Array.isArray(eventsRaw)
+    ? eventsRaw.filter((e) => {
+        const repoFullName = (e.repo?.name || '').toLowerCase();
+        return repoFullName.startsWith(`${targetUser}/`);
+      })
+    : [];
+
+  const events = filteredEvents.slice(0, 5).map(formatEvent);
+
 
   const width = options.width || 467;
   const height = 195;

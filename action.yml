@@ -79,7 +79,12 @@ inputs:
     description: 'Custom comma-separated skills and scores for radar (e.g. "Algorithms:0.94,Full Stack:0.96,Distributed:0.88,System Design:0.90,APIs & DBs:0.95")'
     required: false
     default: ''
+  exclude-repos:
+    description: 'Comma-separated list of repository names or substrings to exclude from activity feed and stats'
+    required: false
+    default: ''
   output-dir:
+
     description: 'Target directory where generated SVG files will be saved'
     required: false
     default: 'assets'

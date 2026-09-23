@@ -40,6 +40,7 @@ async function run() {
     const gfgUser = core.getInput('gfg-username') || core.getInput('gfg_username') || username;
     const hackerrankUser = core.getInput('hackerrank-username') || core.getInput('hackerrank_username') || username;
     const duolingoUser = core.getInput('duolingo-username') || core.getInput('duolingo_username') || username;
+    const excludeRepos = core.getInput('exclude-repos') || core.getInput('ignored-repos') || '';
 
     if (!username) {
       throw new Error('Username is required. Specify input "username" or set GITHUB_REPOSITORY_OWNER.');
@@ -75,7 +76,9 @@ async function run() {
       borderRadius,
       showBorder,
       skills: radarSkills,
+      excludeRepos,
     };
+
 
     let calendarData = null;
     const needCalendar = requested.some((r) => ['3d-city', 'city', 'velocity', 'achievements', 'summary'].includes(r));
